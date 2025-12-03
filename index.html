@@ -3,660 +3,471 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ساختار و شرح وظایف انگلیش‌لند</title>
+    <title>سیستم مدیریت فرآیند انگلیش‌لند</title>
+    
+    <!-- 1. Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- 2. Load FontAwesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- 3. Load React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- 4. Load Babel for JSX support -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
     <style>
         body {
-            font-family: 'Vazirmatn', sans-serif;
-            background-color: #f8fafc;
-            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-            background-size: 24px 24px;
+            font-family: 'Tahoma', 'Segoe UI', sans-serif;
+            background-color: #f1f5f9;
         }
-
-        /* --- TREE CHART STYLES (Fixed for connections) --- */
-        .tree-container {
-            /* Force LTR for the tree structure lines to render correctly */
-            direction: ltr; 
-            overflow-x: auto;
-            display: flex;
-            justify-content: center;
-            padding-bottom: 20px;
-        }
-
-        .tree {
-            white-space: nowrap;
-            min-width: 800px; /* Ensure enough width */
-        }
-        
-        .tree ul {
-            padding-top: 20px; 
-            position: relative; 
-            transition: all 0.5s;
-            display: flex;
-            justify-content: center;
-        }
-
-        .tree li {
-            float: left; text-align: center; 
-            list-style-type: none; 
-            position: relative; 
-            padding: 20px 10px 0 10px;
-            transition: all 0.5s;
-        }
-
-        /* We will use ::before and ::after to draw the connectors */
-        .tree li::before, .tree li::after {
-            content: ''; 
-            position: absolute; 
-            top: 0; 
-            right: 50%;
-            border-top: 2px solid #cbd5e1; 
-            width: 50%; 
-            height: 20px;
-        }
-        .tree li::after { 
-            right: auto; 
-            left: 50%; 
-            border-left: 2px solid #cbd5e1; 
-        }
-
-        /* We need to remove left-right connectors from elements without any siblings */
-        .tree li:only-child::after, .tree li:only-child::before { 
-            display: none; 
-        }
-
-        /* Remove space from the top of single children */
-        .tree li:only-child { 
-            padding-top: 0; 
-        }
-
-        /* Remove left connector from first child and right connector from last child */
-        .tree li:first-child::before, .tree li:last-child::after { 
-            border: 0 none; 
-        }
-
-        /* Adding back the vertical connector to the last nodes */
-        .tree li:last-child::before { 
-            border-right: 2px solid #cbd5e1; 
-            border-radius: 0 5px 0 0; 
-        }
-        .tree li:first-child::after { 
-            border-radius: 5px 0 0 0; 
-        }
-
-        /* Time to add downward connectors from parents */
-        .tree ul ul::before {
-            content: ''; 
-            position: absolute; 
-            top: 0; 
-            left: 50%;
-            border-left: 2px solid #cbd5e1; 
-            width: 0; 
-            height: 20px;
-        }
-
-        /* Tree Card Styling */
-        .tree-card {
-            background: white; 
-            border: 1px solid #e2e8f0; 
-            padding: 10px 15px;
-            border-radius: 12px; 
-            display: inline-block; 
-            text-decoration: none;
-            color: #334155; 
-            font-size: 0.8rem; 
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            transition: all 0.2s; 
-            min-width: 130px;
-            position: relative;
-            z-index: 10;
-        }
-        .tree-card:hover { 
-            transform: translateY(-3px); 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); 
-            border-color: #94a3b8; 
-        }
-        
-        /* Top Borders */
-        .t-ceo { border-top: 4px solid #f59e0b; }
-        .t-int { border-top: 4px solid #4f46e5; }
-        .t-fin { border-top: 4px solid #10b981; }
-        .t-mkt { border-top: 4px solid #db2777; }
-        .t-edu { border-top: 4px solid #ef4444; }
-
-        /* --- DESCRIPTION CARDS STYLES --- */
-        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        
-        .role-details {
-            max-height: 0; overflow: hidden; transition: max-height 0.6s ease-out, opacity 0.4s ease-out; opacity: 0;
-        }
-        .role-card.active .role-details {
-            max-height: 1500px; opacity: 1; transition: max-height 0.8s ease-in, opacity 0.4s ease-in;
-        }
-        .role-card.active .chevron-icon { transform: rotate(180deg); }
-        
-        .badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
-        
-        /* Borders for cards */
-        .border-l-manager { border-left: 4px solid #4f46e5; }
-        .border-l-edu { border-left: 4px solid #dc2626; }
-        .border-l-mkt { border-left: 4px solid #db2777; }
-        .border-l-fin { border-left: 4px solid #059669; }
-
-        /* Custom Scrollbar */
+        /* Hide scrollbar for clean UI */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
-<body class="text-slate-700 pb-20 selection:bg-yellow-200 selection:text-slate-800">
+<body>
+    <div id="root"></div>
 
-    <!-- Header -->
-    <header class="bg-white/90 backdrop-blur shadow-sm border-b border-slate-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <i class="fas fa-layer-group text-yellow-500 text-2xl"></i>
-                <h1 class="text-lg font-bold text-slate-800">ساختار سازمانی <span class="text-yellow-600">English</span>Land</h1>
-            </div>
-            <span class="text-xs bg-slate-100 px-3 py-1 rounded-full text-slate-500">نسخه جامع (SOP)</span>
-        </div>
-    </header>
+    <script type="text/babel">
+        const { useState, useMemo } = React;
 
-    <main class="max-w-7xl mx-auto px-4 py-8">
+        // ==========================================
+        // 1. DATABASE
+        // ==========================================
 
-        <!-- 1. VISUAL ORG CHART (TREE) -->
-        <section class="mb-12 border-b border-slate-200 pb-8">
-            <div class="text-center mb-6">
-                <h2 class="text-xl font-bold text-slate-700">نمای کلی ساختار (Chart View)</h2>
-            </div>
+        const rolesDB = [
+            // C-Level
+            { id: 'R-CEO', title: 'مدیر عامل (CEO)', parent: null, holder: 'P-01', color: 'bg-amber-100 border-amber-300 text-amber-800' },
             
-            <!-- Force LTR for correct rendering of connectors -->
-            <div class="tree-container">
-                <div class="tree">
-                    <ul>
-                        <li>
-                            <a href="#" class="tree-card t-ceo">
-                                <div class="font-bold text-lg">Dr. Bahareh</div>
-                                <div class="text-[10px] text-slate-400 font-bold uppercase">CEO / Managing Director</div>
-                            </a>
-                            <ul>
-                                <!-- 1. INTERNAL -->
-                                <li>
-                                    <a href="#internal" class="tree-card t-int">
-                                        <div class="font-bold text-indigo-700">Miss Ghazal</div>
-                                        <div class="text-[10px] text-slate-500">Internal Manager</div>
-                                    </a>
-                                    <ul>
-                                        <li>
-                                            <a href="#" class="tree-card">
-                                                <div class="font-bold">Raha</div>
-                                                <div class="text-[9px] text-slate-400">Supervisor</div>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="tree-card">
-                                                <div class="font-bold">Zahra</div>
-                                                <div class="text-[9px] text-slate-400">Admin</div>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
+            // Functional Heads
+            { id: 'R-INT', title: 'مدیر داخلی & HR', parent: 'R-CEO', holder: 'P-02', color: 'bg-indigo-100 border-indigo-300 text-indigo-800' },
+            { id: 'R-FIN', title: 'مدیر مالی', parent: 'R-CEO', holder: 'P-03', color: 'bg-emerald-100 border-emerald-300 text-emerald-800' },
+            { id: 'R-MKT', title: 'مدیر مارکتینگ', parent: 'R-CEO', holder: 'P-04', color: 'bg-pink-100 border-pink-300 text-pink-800' },
+            { id: 'R-EDU', title: 'مدیر آموزش', parent: 'R-CEO', holder: 'P-05', color: 'bg-red-100 border-red-300 text-red-800' },
 
-                                <!-- 2. MARKETING -->
-                                <li>
-                                    <a href="#marketing" class="tree-card t-mkt">
-                                        <div class="font-bold text-pink-600">Mr. Ashkan</div>
-                                        <div class="text-[10px] text-slate-500">Marketing Mgr</div>
-                                    </a>
-                                    <ul>
-                                        <li>
-                                            <a href="#" class="tree-card">
-                                                <div class="font-bold">Sales & Social</div>
-                                                <div class="text-[9px] text-slate-400">Saghi / Shirin / Parnian</div>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
+            // Operational
+            { id: 'R-SUP-H', title: 'سوپروایزر حضوری', parent: 'R-EDU', holder: 'P-06', color: 'bg-slate-100 border-slate-300 text-slate-700' },
+            { id: 'R-SUP-O', title: 'سوپروایزر آنلاین', parent: 'R-EDU', holder: 'P-07', color: 'bg-slate-100 border-slate-300 text-slate-700' },
+            { id: 'R-REC-S', title: 'سرپرست پذیرش', parent: 'R-INT', holder: 'P-08', color: 'bg-slate-100 border-slate-300 text-slate-700' },
+            { id: 'R-ADM', title: 'مسئول اداری', parent: 'R-INT', holder: 'P-09', color: 'bg-slate-100 border-slate-300 text-slate-700' },
+            { id: 'R-SAL', title: 'کارشناس فروش', parent: 'R-MKT', holder: 'P-10', color: 'bg-slate-100 border-slate-300 text-slate-700' },
+            { id: 'R-EVT', title: 'مدیر رویداد', parent: 'R-MKT', holder: 'P-11', color: 'bg-slate-100 border-slate-300 text-slate-700' },
+        ];
 
-                                <!-- 3. FINANCE -->
-                                <li>
-                                    <a href="#finance" class="tree-card t-fin">
-                                        <div class="font-bold text-emerald-600">Mr. Iman</div>
-                                        <div class="text-[10px] text-slate-500">Finance Mgr</div>
-                                    </a>
-                                    <ul>
-                                        <li>
-                                            <a href="#" class="tree-card">
-                                                <div class="font-bold">Sub-Team</div>
-                                                <div class="text-[9px] text-slate-400">Shirin (Col) / Zahra (Proc)</div>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                
-                                <!-- 4. EDUCATION -->
-                                 <li>
-                                    <a href="#education" class="tree-card t-edu">
-                                        <div class="font-bold text-red-600">Education Dept</div>
-                                        <div class="text-[10px] text-slate-500">Supervisors</div>
-                                    </a>
-                                    <ul>
-                                        <li>
-                                            <a href="#" class="tree-card">
-                                                <div class="font-bold">In-Person</div>
-                                                <div class="text-[9px] text-slate-400">Afsaneh / Elaheh</div>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="tree-card">
-                                                <div class="font-bold">Online</div>
-                                                <div class="text-[9px] text-slate-400">Ghazal / Marjan</div>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </section>
+        const personnelDB = [
+            { code: 'P-01', name: 'دکتر بهاره', lineManager: null },
+            { code: 'P-02', name: 'میس غزال', lineManager: 'P-01' },
+            { code: 'P-03', name: 'آقای ایمان', lineManager: 'P-01' },
+            { code: 'P-04', name: 'آقای اشکان', lineManager: 'P-01' },
+            { code: 'P-05', name: 'میس افسانه', lineManager: 'P-01' },
+            { code: 'P-06', name: 'میس الهه', lineManager: 'P-05' },
+            { code: 'P-07', name: 'میس مرجان', lineManager: 'P-05' },
+            { code: 'P-08', name: 'میس رها', lineManager: 'P-02' },
+            { code: 'P-09', name: 'میس زهرا', lineManager: 'P-02' },
+            { code: 'P-10', name: 'میس شیرین', lineManager: 'P-04' },
+            { code: 'P-11', name: 'میس پرنیان', lineManager: 'P-04' },
+        ];
 
+        const processesDB = [
+            { id: 'BP-01', name: 'جذب و ثبت‌نام', owner: 'R-MKT', description: 'مسیر تبدیل تماس تلفنی به دانش‌آموز.' },
+            { id: 'BP-02', name: 'برگزاری رویداد', owner: 'R-EVT', description: 'طراحی و اجرای ایونت‌های مناسبتی.' },
+            { id: 'BP-03', name: 'تضمین کیفیت آموزش', owner: 'R-EDU', description: 'آبزرو کلاس‌ها و فیدبک به معلم.' },
+            { id: 'BP-04', name: 'مدیریت تنخواه و خرید', owner: 'R-FIN', description: 'خریدهای مصرفی و مدیریت هزینه‌های جاری.' },
+            { id: 'BP-05', name: 'مدیریت شکایات (CRM)', owner: 'R-INT', description: 'رسیدگی به اعتراضات والدین.' },
+            { id: 'BP-06', name: 'تدارکات و نگهداری', owner: 'R-INT', description: 'نظافت و تعمیرات تجهیزات.' },
+            { id: 'BP-07', name: 'حقوق و دستمزد', owner: 'R-FIN', description: 'محاسبه ساعات کار، کسر غیبت و پرداخت حقوق.' },
+            { id: 'BP-08', name: 'برنامه‌ریزی کلاس', owner: 'R-EDU', description: 'نیازسنجی، تعیین معلم و زمان‌بندی ترم جدید.' },
+            { id: 'BP-09', name: 'ادغام کلاس‌ها', owner: 'R-EDU', description: 'مدیریت کلاس‌های زیر حد نصاب.' },
+            { id: 'BP-10', name: 'تبلیغات و کمپین', owner: 'R-MKT', description: 'طراحی و انتشار تبلیغات محیطی و دیجیتال.' },
+            { id: 'BP-11', name: 'سوشال مدیا', owner: 'R-MKT', description: 'تقویم محتوایی، فیلمبرداری و انتشار پست/استوری.' },
+            { id: 'BP-12', name: 'درخواست مرخصی', owner: 'R-INT', description: 'ثبت، بررسی پوشش کلاس/شیفت و تایید مرخصی.' },
+            { id: 'BP-13', name: 'درخواست مساعده', owner: 'R-FIN', description: 'درخواست وام یا پیش‌پرداخت حقوق.' },
+            { id: 'BP-14', name: 'استخدام اداری', owner: 'R-INT', description: 'جذب نیروهای پذیرش، خدمات و اداری.' },
+            { id: 'BP-15', name: 'استخدام معلم', owner: 'R-EDU', description: 'فراخوان، دمو، مصاحبه و قرارداد آموزشی.' },
+            { id: 'BP-16', name: 'تشویق و تنبیه', owner: 'R-INT', description: 'بررسی عملکرد و اعمال پاداش یا جریمه.' },
+            { id: 'BP-17', name: 'مدیریت بحران', owner: 'R-CEO', description: 'مدیریت شرایط اضطراری سازمانی.' },
+            { id: 'BP-18', name: 'حوادث آنی', owner: 'R-INT', description: 'واکنش سریع به حوادث فیزیکی.' },
+            { id: 'BP-19', name: 'سیاست‌گذاری کلان', owner: 'R-CEO', description: 'تعیین اهداف سالانه و استراتژی.' },
+        ];
 
-        <!-- 2. DETAILED JOB DESCRIPTIONS -->
-        <div class="text-center mb-10">
-            <h2 class="text-2xl font-black text-slate-800">شرح وظایف تفصیلی (Job Descriptions)</h2>
-            <p class="text-sm text-slate-500">برای مشاهده جزئیات کامل، روی کارت هر شخص کلیک کنید.</p>
-        </div>
+        const tasksDB = [
+            // BP-01
+            { id: 'T1', pid: 'BP-01', role: 'R-SAL', type: 'Main', desc: 'پاسخگویی و ثبت لید', freq: 'روزانه' },
+            { id: 'T2', pid: 'BP-01', role: 'R-SAL', type: 'Main', desc: 'مشاوره حضوری', freq: 'روزانه' },
+            { id: 'T3', pid: 'BP-01', role: 'R-SUP-H', type: 'Support', desc: 'تعیین سطح', freq: 'موردی' },
+            { id: 'T4', pid: 'BP-01', role: 'R-ADM', type: 'Main', desc: 'تکمیل پرونده', freq: 'روزانه' },
+            { id: 'T5', pid: 'BP-01', role: 'R-REC-S', type: 'Control', desc: 'تایید نهایی ثبت‌نام', freq: 'روزانه' },
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            // BP-07 Payroll
+            { id: 'T6', pid: 'BP-07', role: 'R-REC-S', type: 'Main', desc: 'ارسال کارکرد اداری', freq: 'ماهانه' },
+            { id: 'T7', pid: 'BP-07', role: 'R-EDU', type: 'Main', desc: 'ارسال کارکرد معلمین', freq: 'ماهانه' },
+            { id: 'T8', pid: 'BP-07', role: 'R-FIN', type: 'Main', desc: 'محاسبه فیش حقوقی', freq: 'ماهانه' },
+            { id: 'T9', pid: 'BP-07', role: 'R-CEO', type: 'Control', desc: 'تایید لیست پرداخت', freq: 'ماهانه' },
+            { id: 'T10', pid: 'BP-07', role: 'R-FIN', type: 'Main', desc: 'واریز وجه', freq: 'ماهانه' },
 
-            <!-- COLUMN 1: INTERNAL OPS -->
-            <div id="internal" class="space-y-5">
-                <div class="flex items-center gap-3 pb-2 border-b border-slate-200">
-                    <span class="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
-                    <h2 class="text-lg font-bold text-slate-800">مدیریت داخلی</h2>
-                </div>
+            // BP-15 Teacher Hiring
+            { id: 'T11', pid: 'BP-15', role: 'R-EDU', type: 'Main', desc: 'بررسی رزومه', freq: 'موردی' },
+            { id: 'T12', pid: 'BP-15', role: 'R-SUP-H', type: 'Main', desc: 'جلسه دمو (Demo)', freq: 'موردی' },
+            { id: 'T13', pid: 'BP-15', role: 'R-EDU', type: 'Control', desc: 'تایید فنی نهایی', freq: 'موردی' },
+            { id: 'T14', pid: 'BP-15', role: 'R-INT', type: 'Support', desc: 'عقد قرارداد', freq: 'موردی' },
 
-                <!-- GHAZAL -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden card-hover role-card cursor-pointer border-l-manager" onclick="toggleCard(this)">
-                    <div class="p-4 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl"><i class="fas fa-user-shield"></i></div>
-                            <div>
-                                <h3 class="font-bold text-slate-800">میس غزال</h3>
-                                <div class="text-xs text-indigo-600 font-bold">مدیر داخلی و منابع انسانی</div>
+            // BP-17 Crisis
+            { id: 'T15', pid: 'BP-17', role: 'R-INT', type: 'Main', desc: 'تشخیص و گزارش بحران', freq: 'آنی' },
+            { id: 'T16', pid: 'BP-17', role: 'R-CEO', type: 'Main', desc: 'تشکیل کمیته اضطرار', freq: 'آنی' },
+            { id: 'T17', pid: 'BP-17', role: 'R-MKT', type: 'Support', desc: 'مدیریت رسانه/شایعات', freq: 'موردی' },
+            { id: 'T18', pid: 'BP-17', role: 'R-CEO', type: 'Control', desc: 'اعلام وضعیت عادی', freq: 'موردی' },
+
+            // BP-02 Events
+            { id: 'T19', pid: 'BP-02', role: 'R-EVT', type: 'Main', desc: 'طراحی سناریو ایونت', freq: 'فصلی' },
+            { id: 'T20', pid: 'BP-02', role: 'R-FIN', type: 'Control', desc: 'تایید بودجه', freq: 'موردی' },
+            { id: 'T21', pid: 'BP-02', role: 'R-ADM', type: 'Support', desc: 'خرید و تدارکات', freq: 'موردی' },
+            { id: 'T22', pid: 'BP-02', role: 'R-MKT', type: 'Main', desc: 'تبلیغات و دعوت', freq: 'روزانه' },
+            { id: 'T23', pid: 'BP-02', role: 'R-REC-S', type: 'Support', desc: 'اجرا و نظم‌دهی', freq: 'موردی' },
+
+            // BP-12 Leave
+            { id: 'T24', pid: 'BP-12', role: 'R-REC-S', type: 'Main', desc: 'درخواست اولیه مرخصی', freq: 'موردی' },
+            { id: 'T25', pid: 'BP-12', role: 'R-INT', type: 'Control', desc: 'بررسی جانشین و تایید', freq: 'موردی' },
+            { id: 'T26', pid: 'BP-12', role: 'R-ADM', type: 'Support', desc: 'ثبت در سیستم حضور غیاب', freq: 'موردی' },
+
+            // BP-05 Complaints
+            { id: 'T27', pid: 'BP-05', role: 'R-REC-S', type: 'Main', desc: 'دریافت شکایت و آرام‌سازی', freq: 'موردی' },
+            { id: 'T28', pid: 'BP-05', role: 'R-EDU', type: 'Support', desc: 'بررسی فنی (آموزشی)', freq: 'موردی' },
+            { id: 'T29', pid: 'BP-05', role: 'R-INT', type: 'Control', desc: 'تماس مدیریتی و حل مشکل', freq: 'موردی' },
+
+            // Additional Tasks
+            { id: 'T30', pid: 'BP-03', role: 'R-SUP-H', type: 'Main', desc: 'آبزرو کلاس', freq: 'هفتگی' },
+            { id: 'T31', pid: 'BP-03', role: 'R-EDU', type: 'Control', desc: 'فیدبک به معلم', freq: 'ماهانه' },
+            
+            { id: 'T32', pid: 'BP-04', role: 'R-ADM', type: 'Main', desc: 'درخواست خرید', freq: 'موردی' },
+            { id: 'T33', pid: 'BP-04', role: 'R-FIN', type: 'Control', desc: 'پرداخت تنخواه', freq: 'موردی' },
+
+            { id: 'T34', pid: 'BP-06', role: 'R-ADM', type: 'Main', desc: 'چک‌لیست نظافت', freq: 'روزانه' },
+            { id: 'T35', pid: 'BP-06', role: 'R-INT', type: 'Control', desc: 'بازرسی محیطی', freq: 'هفتگی' },
+
+            { id: 'T36', pid: 'BP-08', role: 'R-SUP-H', type: 'Main', desc: 'چیدمان برنامه ترم', freq: 'فصلی' },
+            { id: 'T37', pid: 'BP-08', role: 'R-EDU', type: 'Control', desc: 'تصویب نهایی کلاس‌ها', freq: 'فصلی' },
+
+            { id: 'T38', pid: 'BP-09', role: 'R-REC-S', type: 'Main', desc: 'شناسایی کلاس کم‌ظرفیت', freq: 'هفتگی' },
+            { id: 'T39', pid: 'BP-09', role: 'R-EDU', type: 'Control', desc: 'دستور ادغام', freq: 'موردی' },
+
+            { id: 'T40', pid: 'BP-10', role: 'R-MKT', type: 'Main', desc: 'طراحی کمپین', freq: 'فصلی' },
+            { id: 'T41', pid: 'BP-10', role: 'R-FIN', type: 'Control', desc: 'پرداخت هزینه تبلیغات', freq: 'موردی' },
+
+            { id: 'T42', pid: 'BP-11', role: 'R-MKT', type: 'Main', desc: 'تقویم محتوایی', freq: 'هفتگی' },
+            { id: 'T43', pid: 'BP-11', role: 'R-SAL', type: 'Main', desc: 'انتشار استوری', freq: 'روزانه' },
+
+            { id: 'T44', pid: 'BP-13', role: 'R-FIN', type: 'Main', desc: 'بررسی درخواست مساعده', freq: 'موردی' },
+            { id: 'T45', pid: 'BP-13', role: 'R-CEO', type: 'Control', desc: 'تایید نهایی', freq: 'موردی' },
+
+            { id: 'T46', pid: 'BP-14', role: 'R-INT', type: 'Main', desc: 'مصاحبه اداری', freq: 'موردی' },
+            { id: 'T47', pid: 'BP-14', role: 'R-CEO', type: 'Control', desc: 'تایید استخدام', freq: 'موردی' },
+
+            { id: 'T48', pid: 'BP-16', role: 'R-SUP-H', type: 'Main', desc: 'گزارش تخلف/تشویق', freq: 'موردی' },
+            { id: 'T49', pid: 'BP-16', role: 'R-CEO', type: 'Control', desc: 'صدور حکم انضباطی', freq: 'موردی' },
+
+            { id: 'T50', pid: 'BP-18', role: 'R-REC-S', type: 'Main', desc: 'تخلیه اضطراری', freq: 'آنی' },
+            { id: 'T51', pid: 'BP-18', role: 'R-INT', type: 'Control', desc: 'مدیریت صحنه حادثه', freq: 'آنی' },
+
+            { id: 'T52', pid: 'BP-19', role: 'R-CEO', type: 'Main', desc: 'تدوین استراتژی سالانه', freq: 'سالانه' },
+            { id: 'T53', pid: 'BP-19', role: 'R-MKT', type: 'Support', desc: 'تحلیل بازار', freq: 'سالانه' },
+        ];
+
+        function EnglishLandBPM() {
+            const [activeTab, setActiveTab] = useState('process');
+            const [selectedProcess, setSelectedProcess] = useState('BP-01');
+            const [selectedRoleForJD, setSelectedRoleForJD] = useState(null);
+
+            // Logic for BPMN
+            const bpmnData = useMemo(() => {
+                const tasks = tasksDB.filter(t => t.pid === selectedProcess);
+                const involvedRoles = [...new Set(tasks.map(t => t.role))];
+                involvedRoles.sort((a, b) => {
+                    return rolesDB.findIndex(r => r.id === a) - rolesDB.findIndex(r => r.id === b);
+                });
+                return { tasks, involvedRoles };
+            }, [selectedProcess]);
+
+            // Logic for JD
+            const getJD = (roleId) => {
+                return tasksDB.filter(t => t.role === roleId).map(t => {
+                    const p = processesDB.find(proc => proc.id === t.pid);
+                    return { ...t, procName: p?.name, procOwner: p?.owner };
+                });
+            };
+
+            // Helper for Process Detail
+            const getPerson = (roleId) => {
+                const role = rolesDB.find(r => r.id === roleId);
+                return personnelDB.find(p => p.code === role.holder)?.name || 'ناشناس';
+            };
+
+            return (
+                <div className="min-h-screen bg-slate-100 font-sans text-slate-800 p-4 lg:p-6" dir="rtl">
+                    
+                    {/* Header */}
+                    <header className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            <h1 className="text-2xl font-black text-slate-800 flex items-center gap-3">
+                                <i className="fas fa-layer-group text-indigo-600 text-3xl"></i>
+                                سیستم مدیریت فرآیند <span className="text-yellow-600">English</span>Land
+                            </h1>
+                            <p className="text-sm text-slate-500 mt-2 font-bold">
+                                نسخه نهایی | پوشش ۱۹ فرآیند کلیدی
+                            </p>
+                        </div>
+                        <div className="flex bg-slate-100 p-1 rounded-xl overflow-x-auto max-w-full">
+                            <button onClick={() => setActiveTab('process')} className={`px-4 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'process' ? 'bg-white text-indigo-700 shadow-md transform scale-105' : 'text-slate-500 hover:text-slate-700'}`}>
+                                <i className="fas fa-network-wired"></i> نقشه فرآیندها
+                            </button>
+                            <button onClick={() => setActiveTab('jd')} className={`px-4 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'jd' ? 'bg-white text-indigo-700 shadow-md transform scale-105' : 'text-slate-500 hover:text-slate-700'}`}>
+                                <i className="fas fa-file-alt"></i> شرح وظایف
+                            </button>
+                            <button onClick={() => setActiveTab('org')} className={`px-4 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'org' ? 'bg-white text-indigo-700 shadow-md transform scale-105' : 'text-slate-500 hover:text-slate-700'}`}>
+                                <i className="fas fa-sitemap"></i> چارت سازمانی
+                            </button>
+                            <button onClick={() => setActiveTab('bpmn')} className={`px-4 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'bpmn' ? 'bg-indigo-600 text-white shadow-md transform scale-105' : 'text-slate-500 hover:text-slate-700'}`}>
+                                <i className="fas fa-project-diagram"></i> مدل گرافیکی BPMN
+                            </button>
+                        </div>
+                    </header>
+
+                    {/* TAB 1: PROCESS MAP (Timeline) */}
+                    {activeTab === 'process' && (
+                        <div className="grid grid-cols-1 gap-6">
+                           {processesDB.map(proc => (
+                             <div key={proc.id} className={`bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm ${proc.id.includes('17') || proc.id.includes('18') ? 'ring-2 ring-red-100' : ''}`}>
+                               <div className={`p-4 border-b border-slate-200 ${proc.id.includes('17') || proc.id.includes('18') ? 'bg-red-50' : 'bg-slate-50'}`}>
+                                 <div className="flex justify-between items-center">
+                                   <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                                     {proc.id.includes('17') || proc.id.includes('18') ? <i className="fas fa-exclamation-triangle text-red-500"></i> : <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}
+                                     {proc.name} <span className="text-xs font-normal text-slate-400">({proc.id})</span>
+                                   </h3>
+                                   <div className="text-xs text-slate-500 bg-white border border-slate-200 px-2 py-1 rounded">
+                                     مدیر فرآیند: <strong className="text-blue-600">{rolesDB.find(r => r.id === proc.owner)?.title}</strong>
+                                   </div>
+                                 </div>
+                                 <p className="text-xs text-slate-500 mt-2 mr-4">{proc.description}</p>
+                               </div>
+                               
+                               <div className="p-6 overflow-x-auto">
+                                 <div className="flex items-start min-w-max gap-4">
+                                    {tasksDB.filter(t => t.pid === proc.id).map((task, idx) => {
+                                      const roleInfo = rolesDB.find(r => r.id === task.role);
+                                      const personName = getPerson(task.role);
+                                      return (
+                                        <div key={task.id} className="flex items-center gap-4">
+                                           <div className="relative w-64 bg-white border border-slate-200 rounded-lg p-3 shadow-sm hover:border-blue-300 hover:shadow-md transition-all group">
+                                              <div className="absolute top-0 right-0 bg-slate-100 text-slate-500 text-[9px] px-2 rounded-bl-lg border-b border-l border-slate-200">
+                                                مرحله {idx + 1}
+                                              </div>
+                                              <div className="mt-3">
+                                                <div className="text-xs font-bold text-slate-700 mb-1 line-clamp-2 h-8">{task.desc}</div>
+                                                <div className="flex justify-between items-end mt-2 pt-2 border-t border-slate-100">
+                                                  <div>
+                                                    <div className="text-[10px] text-blue-600 font-bold">{roleInfo.title}</div>
+                                                    <div className="text-[9px] text-slate-400">{personName}</div>
+                                                  </div>
+                                                  <div className="text-[9px] bg-slate-50 px-1.5 py-0.5 rounded text-slate-500 border border-slate-100">
+                                                    {task.freq}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                           </div>
+                                           {idx < tasksDB.filter(t => t.pid === proc.id).length - 1 && (
+                                             <i className="fas fa-arrow-left text-slate-300"></i>
+                                           )}
+                                        </div>
+                                      )
+                                    })}
+                                 </div>
+                               </div>
+                             </div>
+                           ))}
+                        </div>
+                    )}
+
+                    {/* TAB 2: JD (Job Descriptions) */}
+                    {activeTab === 'jd' && (
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                            <div className="lg:col-span-1 space-y-2">
+                                <div className="bg-white p-3 rounded-lg border border-slate-200 mb-2">
+                                    <h3 className="text-xs font-bold text-slate-400 mb-2">لیست پرسنل</h3>
+                                    <div className="relative">
+                                        <i className="fas fa-search absolute left-2 top-2.5 text-slate-300 text-sm"></i>
+                                        <input type="text" placeholder="جستجو..." className="w-full bg-slate-50 border border-slate-200 rounded p-2 text-sm pl-8" />
+                                    </div>
+                                </div>
+                                <div className="space-y-2 h-[600px] overflow-y-auto">
+                                    {rolesDB.map(role => {
+                                        const p = personnelDB.find(x => x.code === role.holder);
+                                        return (
+                                            <button key={role.id} onClick={() => setSelectedRoleForJD(role.id)} className={`w-full text-right p-3 rounded-xl border transition-all ${selectedRoleForJD === role.id ? 'bg-indigo-50 border-indigo-300 shadow-sm' : 'bg-white border-slate-100 hover:bg-slate-50'}`}>
+                                                <div className="font-bold text-slate-700 text-sm">{p.name}</div>
+                                                <div className="text-xs text-slate-500">{role.title}</div>
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                            <div className="lg:col-span-3">
+                                {selectedRoleForJD ? (
+                                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 min-h-[600px]">
+                                        <div className="flex items-center gap-4 mb-8 pb-6 border-b border-slate-100">
+                                            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-2xl font-bold">
+                                                {personnelDB.find(p => p.code === rolesDB.find(r => r.id === selectedRoleForJD).holder).name.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <h2 className="text-2xl font-black text-slate-800">
+                                                    {personnelDB.find(p => p.code === rolesDB.find(r => r.id === selectedRoleForJD).holder).name}
+                                                </h2>
+                                                <div className="text-indigo-600 font-bold bg-indigo-50 px-3 py-1 rounded-full text-sm inline-block mt-2">
+                                                    {rolesDB.find(r => r.id === selectedRoleForJD).title}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="col-span-2">
+                                                <h3 className="font-bold text-slate-700 mb-4 flex items-center gap-2"><i className="fas fa-briefcase"></i> لیست وظایف بر اساس فرآیند</h3>
+                                                <div className="space-y-3">
+                                                    {getJD(selectedRoleForJD).length > 0 ? getJD(selectedRoleForJD).map((task, idx) => (
+                                                        <div key={idx} className="flex items-start gap-4 p-4 rounded-xl border border-slate-100 hover:border-indigo-200 hover:shadow-sm transition-all bg-slate-50/50">
+                                                            <div className={`mt-1 min-w-[60px] text-center px-2 py-1 rounded text-[10px] font-bold ${task.type === 'Main' ? 'bg-emerald-100 text-emerald-700' : task.type === 'Control' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+                                                                {task.type === 'Main' ? 'اجرا' : task.type === 'Control' ? 'تایید' : 'کمک'}
+                                                            </div>
+                                                            <div className="flex-grow">
+                                                                <p className="text-sm font-bold text-slate-800">{task.desc}</p>
+                                                                <div className="flex gap-4 mt-2 text-xs text-slate-400">
+                                                                    <span className="flex items-center gap-1"><i className="fas fa-layer-group"></i> {task.procName}</span>
+                                                                    <span className="flex items-center gap-1 text-indigo-400"><i className="fas fa-clock"></i> {task.freq}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )) : <div className="text-center py-10 text-slate-400">وظیفه‌ای تعریف نشده است.</div>}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : <div className="h-full flex items-center justify-center text-slate-300">لطفاً یک شخص را انتخاب کنید</div>}
                             </div>
                         </div>
-                        <i class="fas fa-chevron-down text-slate-300 transition-transform duration-300 chevron-icon"></i>
-                    </div>
-                    <div class="role-details bg-slate-50 border-t border-slate-100">
-                        <div class="p-5 text-sm space-y-4">
-                            <div class="bg-indigo-100/50 p-3 rounded-lg border border-indigo-100">
-                                <h4 class="font-bold text-indigo-800 text-xs mb-1">🎯 هدف شغلی</h4>
-                                <p class="text-xs text-slate-600 text-justify">حفظ انضباط سازمانی، یکپارچگی عملیات بین واحدها و مدیریت بحران‌های داخلی.</p>
-                            </div>
-                            <ul class="space-y-3 list-none">
-                                <li class="text-xs text-slate-700 bg-white p-2 rounded shadow-sm border border-slate-100">
-                                    <strong class="block text-indigo-700 mb-1">۱. مدیریت منابع انسانی (HR):</strong>
-                                    تنظیم شیفت‌ها، تایید مرخصی، کنترل پوشش و رفتار سازمانی پرسنل، و حل تعارضات.
-                                </li>
-                                <li class="text-xs text-slate-700 bg-white p-2 rounded shadow-sm border border-slate-100">
-                                    <strong class="block text-indigo-700 mb-1">۲. مدیریت عملیات:</strong>
-                                    نظارت عالیه بر عملکرد پذیرش (رها) و تیم اداری، اطمینان از اجرای پروتکل‌های ثبت‌نام.
-                                </li>
-                                <li class="text-xs text-slate-700 bg-white p-2 rounded shadow-sm border border-slate-100">
-                                    <strong class="block text-indigo-700 mb-1">۳. مدیریت بحران:</strong>
-                                    ورود مستقیم به شکایات پیچیده و حل مسائلی که از سطح سرپرست پذیرش فراتر رفته‌اند.
-                                </li>
-                                <li class="text-xs text-slate-700 bg-white p-2 rounded shadow-sm border border-slate-100">
-                                    <strong class="block text-indigo-700 mb-1">۴. گزارش‌دهی:</strong>
-                                    جمع‌آوری گزارش تمامی واحدها و ارائه داشبورد مدیریتی به مدیرعامل.
-                                </li>
-                            </ul>
-                            <div class="bg-white p-2 rounded border border-indigo-100 text-[10px] text-slate-500 mt-2">
-                                🚀 <strong>آینده:</strong> استقرار سیستم KPI، مدیریت جذب و استخدام، اتوماسیون اداری.
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    )}
 
-                <!-- RAHA -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden card-hover role-card cursor-pointer" onclick="toggleCard(this)">
-                    <div class="p-4 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center"><i class="fas fa-tasks"></i></div>
-                            <div>
-                                <h3 class="font-bold text-slate-800">میس رها</h3>
-                                <div class="text-xs text-slate-500">سرپرست پذیرش و QC</div>
-                            </div>
-                        </div>
-                        <i class="fas fa-chevron-down text-slate-300 transition-transform duration-300 chevron-icon"></i>
-                    </div>
-                    <div class="role-details bg-slate-50 border-t border-slate-100">
-                        <div class="p-4 text-sm space-y-3">
-                            <p class="text-[10px] text-slate-500 bg-white p-2 rounded border border-slate-100 mb-2"><strong>هدف:</strong> مدیریت میدانی سالن پذیرش و به حداقل رساندن خطاهای اجرایی.</p>
-                            <ul class="space-y-2 list-disc list-inside text-xs text-slate-600">
-                                <li><strong>نظارت اجرایی:</strong> چک کردن لحظه‌ای تسک‌های زهرا و شیرین.</li>
-                                <li><strong>کنترل کیفیت (QC):</strong> بازبینی کارنامه‌ها و پیام‌های ارسالی قبل از انتشار.</li>
-                                <li><strong>مدیریت ایمنی:</strong> نظارت بر "تحویل امن" (Safe Dismissal) و حضور و غیاب.</li>
-                                <li><strong>گزارش‌دهی:</strong> تهیه لیست روزانه انصرافی‌ها و ثبت‌نام‌ها برای مدیر داخلی.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ZAHRA -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden card-hover role-card cursor-pointer" onclick="toggleCard(this)">
-                    <div class="p-4 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center"><i class="fas fa-box-open"></i></div>
-                            <div>
-                                <h3 class="font-bold text-slate-800">میس زهرا</h3>
-                                <div class="text-xs text-slate-500">مسئول اداری و تدارکات</div>
-                            </div>
-                        </div>
-                        <i class="fas fa-chevron-down text-slate-300 transition-transform duration-300 chevron-icon"></i>
-                    </div>
-                    <div class="role-details bg-slate-50 border-t border-slate-100">
-                        <div class="p-4 text-sm space-y-3">
-                            <p class="text-[10px] text-slate-500 bg-white p-2 rounded border border-slate-100 mb-2"><strong>هدف:</strong> پشتیبانی لجستیک، مدیریت اسناد و آماده‌سازی محیط.</p>
-                            <ul class="space-y-2 list-disc list-inside text-xs text-slate-600">
-                                <li><strong>بایگانی:</strong> تشکیل و مرتب‌سازی پرونده‌های فیزیکی و دیجیتال.</li>
-                                <li><strong>تدارکات:</strong> خرید ملزومات مصرفی (تحت نظارت واحد مالی).</li>
-                                <li><strong>نظافت:</strong> نظارت مستمر بر تمیزی سرویس‌ها و کلاس‌ها (مدیریت نیروی خدماتی).</li>
-                                <li><strong>ارتباطات:</strong> مدیریت گروه‌های کلاسی واتس‌اپ/تلگرام.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- COLUMN 2: FINANCE & MARKETING -->
-            <div id="finance" class="space-y-5">
-                
-                <!-- FINANCE -->
-                <div class="flex items-center gap-3 pb-2 border-b border-slate-200">
-                    <span class="w-1.5 h-6 bg-emerald-600 rounded-full"></span>
-                    <h2 class="text-lg font-bold text-slate-800">دپارتمان مالی</h2>
-                </div>
-
-                <!-- IMAN -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden card-hover role-card cursor-pointer border-l-fin" onclick="toggleCard(this)">
-                    <div class="p-5 flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl"><i class="fas fa-calculator"></i></div>
-                            <div>
-                                <h3 class="font-bold text-slate-800">آقای ایمان</h3>
-                                <div class="text-xs text-emerald-600 font-bold">مدیر دپارتمان مالی</div>
-                            </div>
-                        </div>
-                        <i class="fas fa-chevron-down text-slate-300 transition-transform duration-300 chevron-icon"></i>
-                    </div>
-                    <div class="role-details bg-slate-50 border-t border-slate-100">
-                        <div class="p-5 text-sm space-y-4">
-                            <div class="bg-emerald-100/50 p-3 rounded-lg border border-emerald-100">
-                                <h4 class="font-bold text-emerald-800 text-xs mb-1">🎯 هدف شغلی</h4>
-                                <p class="text-xs text-slate-600">شفافیت کامل مالی، مدیریت نقدینگی و سودآوری سازمان.</p>
-                            </div>
-                            <ul class="space-y-3 list-none">
-                                <li class="text-xs text-slate-700 bg-white p-2 rounded shadow-sm border border-slate-100">
-                                    <strong class="block text-emerald-700 mb-1">۱. حسابداری و کنترل:</strong>
-                                    ثبت اسناد، کنترل مغایرت بانکی، تایید هزینه‌ها و مدیریت تنخواه.
-                                </li>
-                                <li class="text-xs text-slate-700 bg-white p-2 rounded shadow-sm border border-slate-100">
-                                    <strong class="block text-emerald-700 mb-1">۲. حقوق و دستمزد:</strong>
-                                    محاسبه دقیق ساعات کار معلمین و پرسنل و پرداخت‌ها.
-                                </li>
-                                 <li class="text-xs text-slate-700 bg-white p-2 rounded shadow-sm border border-slate-100">
-                                    <strong class="block text-emerald-700 mb-1">۳. گزارش‌دهی:</strong>
-                                    ارائه گزارش سود و زیان ماهانه به مدیریت.
-                                </li>
-                            </ul>
-                            
-                            <!-- Strategic Addition -->
-                            <div class="mt-2 pt-3 border-t border-dashed border-emerald-300 bg-emerald-50 rounded p-2">
-                                <h4 class="font-bold text-emerald-700 text-[10px] mb-1"><i class="fas fa-chess-knight"></i> مسئولیت‌های استراتژیک & مشاوره</h4>
-                                <ul class="list-disc list-inside text-[10px] text-slate-600 space-y-1">
-                                    <li>مشاوره در قیمت‌گذاری کورس‌های جدید.</li>
-                                    <li>سیستم‌سازی فرآیندهای مالی.</li>
-                                    <li>ایده‌پردازی پروژه‌های جدید سودآور برای آموزشگاه.</li>
-                                </ul>
-                            </div>
-
-                            <!-- Sub-team -->
-                            <div class="mt-2 pt-2 border-t border-slate-200">
-                                <p class="text-[10px] font-bold text-slate-500 mb-1">تیم زیرمجموعه:</p>
-                                <div class="flex gap-2">
-                                    <span class="badge bg-white border border-slate-200 text-slate-600">میس شیرین (وصول)</span>
-                                    <span class="badge bg-white border border-slate-200 text-slate-600">میس زهرا (تدارکات)</span>
+                    {/* TAB 3: ORG CHART */}
+                    {activeTab === 'org' && (
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-10 overflow-x-auto text-center" dir="ltr">
+                            <div className="inline-flex flex-col items-center">
+                                <div className="bg-amber-50 border-2 border-amber-300 p-4 rounded-xl w-48 mb-8 relative z-10 shadow-sm">
+                                    <div className="font-bold text-amber-900">Dr. Bahareh</div>
+                                    <div className="text-xs text-amber-600">CEO</div>
+                                    <div className="absolute -bottom-8 left-1/2 w-px h-8 bg-slate-300"></div>
+                                </div>
+                                <div className="flex gap-6 relative pt-4">
+                                    <div className="absolute top-0 left-10 right-10 h-px bg-slate-300"></div>
+                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-4 bg-slate-300"></div>
+                                    {[
+                                        { name: 'Ghazal', role: 'Internal Mgr', color: 'border-indigo-400 bg-white' },
+                                        { name: 'Ashkan', role: 'Marketing Mgr', color: 'border-pink-400 bg-white' },
+                                        { name: 'Iman', role: 'Finance Mgr', color: 'border-emerald-400 bg-white' },
+                                        { name: 'Edu Dept', role: 'Supervisors', color: 'border-red-400 bg-white' }
+                                    ].map((mgr, i) => (
+                                        <div key={i} className="relative pt-4 flex flex-col items-center">
+                                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-4 bg-slate-300"></div>
+                                            <div className={`border-b-4 p-3 rounded-xl shadow-sm w-40 ${mgr.color}`}>
+                                                <div className="font-bold text-slate-700">{mgr.name}</div>
+                                                <div className="text-xs text-slate-500">{mgr.role}</div>
+                                            </div>
+                                            <div className="w-px h-4 bg-slate-200 mt-1"></div>
+                                            <div className="text-[10px] text-slate-300">▼</div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    )}
 
-                <!-- MARKETING -->
-                <div id="marketing" class="flex items-center gap-3 pb-2 border-b border-slate-200 pt-4">
-                    <span class="w-1.5 h-6 bg-pink-600 rounded-full"></span>
-                    <h2 class="text-lg font-bold text-slate-800">مارکتینگ و فروش</h2>
-                </div>
-
-                <!-- ASHKAN -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden card-hover role-card cursor-pointer border-l-mkt" onclick="toggleCard(this)">
-                    <div class="p-5 flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center text-xl"><i class="fas fa-bullhorn"></i></div>
-                            <div>
-                                <h3 class="font-bold text-slate-800">آقای اشکان</h3>
-                                <div class="text-xs text-pink-600 font-bold">مدیر مارکتینگ</div>
-                            </div>
-                        </div>
-                        <i class="fas fa-chevron-down text-slate-300 transition-transform duration-300 chevron-icon"></i>
-                    </div>
-                    <div class="role-details bg-slate-50 border-t border-slate-100">
-                        <div class="p-5 text-sm space-y-4">
-                            <div class="bg-pink-100/50 p-3 rounded-lg border border-pink-100">
-                                <h4 class="font-bold text-pink-800 text-xs mb-1">🎯 هدف شغلی</h4>
-                                <p class="text-xs text-slate-600">رشد ورودی مشتری (Lead Generation)، تقویت برند و افزایش سهم بازار.</p>
-                            </div>
-                            <ul class="space-y-3 list-none">
-                                <li class="text-xs text-slate-700 bg-white p-2 rounded shadow-sm border border-slate-100">
-                                    <strong class="block text-pink-700 mb-1">۱. استراتژی تبلیغات:</strong>
-                                    بودجه‌بندی و طراحی کمپین‌های فصلی و دیجیتال.
-                                </li>
-                                <li class="text-xs text-slate-700 bg-white p-2 rounded shadow-sm border border-slate-100">
-                                    <strong class="block text-pink-700 mb-1">۲. مدیریت برند:</strong>
-                                    نظارت بر هویت بصری، محتوای سوشال و ایونت‌ها.
-                                </li>
-                            </ul>
-
-                            <!-- Strategic Addition -->
-                            <div class="mt-2 pt-3 border-t border-dashed border-pink-300 bg-pink-50 rounded p-2">
-                                <h4 class="font-bold text-pink-700 text-[10px] mb-1"><i class="fas fa-chess-knight"></i> مسئولیت‌های استراتژیک & مشاوره</h4>
-                                <ul class="list-disc list-inside text-[10px] text-slate-600 space-y-1">
-                                    <li>مشاوره و ایده‌پردازی برای کورس‌های جدید و خلاقانه.</li>
-                                    <li>سیستم‌سازی فرآیندهای فروش (Sales Funnel).</li>
-                                    <li>ارائه طرح‌های توسعه‌ای به مدیریت ارشد.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SALES EXPERTS -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden card-hover role-card cursor-pointer" onclick="toggleCard(this)">
-                    <div class="p-4 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center"><i class="fas fa-headset"></i></div>
-                            <div>
-                                <h3 class="font-bold text-slate-800">میس ساقی / شیرین</h3>
-                                <div class="text-xs text-slate-500">کارشناس فروش</div>
-                            </div>
-                        </div>
-                        <i class="fas fa-chevron-down text-slate-300 transition-transform duration-300 chevron-icon"></i>
-                    </div>
-                    <div class="role-details bg-slate-50 border-t border-slate-100">
-                        <div class="p-4 text-sm space-y-3">
-                            <p class="text-[10px] text-slate-500 bg-white p-2 rounded border border-slate-100 mb-2"><strong>هدف:</strong> تبدیل تماس‌های ورودی به ثبت‌نام قطعی (Closing).</p>
-                            <ul class="space-y-2 list-disc list-inside text-xs text-slate-600">
-                                <li><strong>مشاوره اقناعی:</strong> جلسات حضوری با والدین و پرزنت دوره‌ها.</li>
-                                <li><strong>پیگیری (Follow-up):</strong> تماس مجدد با لیدهای جذب نشده.</li>
-                                <li><strong>مدیریت CRM:</strong> ثبت دقیق اطلاعات تماس‌گیرندگان.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                 <!-- EVENT & SOCIAL -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm text-center card-hover cursor-pointer role-card" onclick="toggleCard(this)">
-                        <div class="text-orange-500 mb-1"><i class="fas fa-glass-cheers"></i></div>
-                        <h4 class="text-xs font-bold text-slate-700">میس پرنیان</h4>
-                        <div class="text-[9px] text-slate-400">مدیر ایونت</div>
-                        <div class="role-details text-right mt-2 text-[9px] text-slate-500 border-t pt-1">
-                            ایده‌پردازی تم، دکور و اجرای مراسم‌های مناسبتی.
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm text-center card-hover cursor-pointer role-card" onclick="toggleCard(this)">
-                        <div class="text-purple-500 mb-1"><i class="fab fa-instagram"></i></div>
-                        <h4 class="text-xs font-bold text-slate-700">شیرین J / آتوسا</h4>
-                        <div class="text-[9px] text-slate-400">سوشال مدیا</div>
-                        <div class="role-details text-right mt-2 text-[9px] text-slate-500 border-t pt-1">
-                            تولید محتوا، استوری روزانه و پاسخگویی دایرکت.
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- COLUMN 3: EDUCATION -->
-            <div id="education" class="space-y-5">
-                <div class="flex items-center gap-3 pb-2 border-b border-slate-200">
-                    <span class="w-1.5 h-6 bg-red-600 rounded-full"></span>
-                    <h2 class="text-lg font-bold text-slate-800">دپارتمان آموزش</h2>
-                </div>
-
-                <!-- SECTION: IN-PERSON -->
-                <div class="mb-4">
-                    <div class="flex items-center gap-2 mb-2 px-1">
-                        <i class="fas fa-building text-red-500 text-xs"></i>
-                        <h3 class="text-sm font-bold text-slate-700">شعبه حضوری</h3>
-                    </div>
-
-                    <!-- AFSANEH -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden card-hover role-card cursor-pointer border-l-edu mb-2" onclick="toggleCard(this)">
-                        <div class="p-4 flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center"><i class="fas fa-user-check"></i></div>
-                                <div>
-                                    <h3 class="font-bold text-slate-800">میس افسانه</h3>
-                                    <div class="text-xs text-red-600 font-bold">سوپروایزر حضوری</div>
+                    {/* TAB 4: BPMN MODEL (The Last Option) */}
+                    {activeTab === 'bpmn' && (
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                            <div className="lg:col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 h-[calc(100vh-200px)] overflow-y-auto">
+                                <h3 className="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                    <i className="fas fa-layer-group"></i> انتخاب فرآیند
+                                </h3>
+                                <div className="space-y-2">
+                                    {processesDB.map(proc => (
+                                        <button
+                                            key={proc.id}
+                                            onClick={() => setSelectedProcess(proc.id)}
+                                            className={`w-full text-right p-3 rounded-xl border transition-all text-xs font-bold flex flex-col gap-1 ${selectedProcess === proc.id ? 'bg-indigo-50 border-indigo-300 text-indigo-800 shadow-sm' : 'bg-white border-slate-100 text-slate-600 hover:bg-slate-50'}`}
+                                        >
+                                            <div className="flex justify-between w-full">
+                                                <span>{proc.name}</span>
+                                                <span className="opacity-50">{proc.id}</span>
+                                            </div>
+                                            {proc.id.includes('17') || proc.id.includes('18') ? 
+                                                <span className="text-[10px] text-red-500 flex items-center gap-1"><i className="fas fa-exclamation-triangle"></i> اضطراری</span> : null
+                                            }
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
-                            <i class="fas fa-chevron-down text-slate-300 transition-transform duration-300 chevron-icon"></i>
-                        </div>
-                        <div class="role-details bg-slate-50 border-t border-slate-100">
-                            <div class="p-4 text-sm space-y-3">
-                                <p class="text-[10px] text-slate-500 bg-white p-2 rounded border border-slate-100 mb-2"><strong>هدف:</strong> مدیریت ارتباط با والدین و چیدمان بهینه کلاس‌ها.</p>
-                                <ul class="space-y-2 list-disc list-inside text-xs text-slate-600">
-                                    <li><strong>ارتباط با اولیا:</strong> جلسات PTM و حل شکایات آموزشی.</li>
-                                    <li><strong>مدیریت کلاس:</strong> برنامه‌ریزی ترمیک و جایگزینی معلم.</li>
-                                    <li><strong>تعیین سطح:</strong> نظارت بر ورودی‌های جدید.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- ELAHEH -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden card-hover role-card cursor-pointer border-l-edu" onclick="toggleCard(this)">
-                        <div class="p-4 flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center"><i class="fas fa-clipboard-check"></i></div>
-                                <div>
-                                    <h3 class="font-bold text-slate-800">میس الهه</h3>
-                                    <div class="text-xs text-red-600 font-bold">سوپروایزر حضوری</div>
+                            <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 overflow-x-auto relative">
+                                <div className="absolute top-4 left-4 bg-slate-100 px-3 py-1 rounded text-xs text-slate-500 font-mono">BPMN View Mode</div>
+                                <h2 className="text-xl font-black text-indigo-900 mb-2 flex items-center gap-2">
+                                    {processesDB.find(p => p.id === selectedProcess).name}
+                                </h2>
+                                <p className="text-sm text-slate-500 mb-8 max-w-2xl">{processesDB.find(p => p.id === selectedProcess).description}</p>
+
+                                <div className="min-w-[800px] border-2 border-slate-300 rounded-lg bg-slate-50 relative">
+                                    <div className="absolute top-0 bottom-0 left-10 w-px bg-slate-200 z-0"></div>
+                                    {bpmnData.involvedRoles.map((roleId, rIndex) => {
+                                        const roleInfo = rolesDB.find(r => r.id === roleId);
+                                        const roleTasks = bpmnData.tasks.filter(t => t.role === roleId);
+                                        return (
+                                            <div key={roleId} className="flex border-b border-slate-300 last:border-b-0 min-h-[120px]">
+                                                <div className={`w-40 flex-shrink-0 p-4 border-l border-slate-300 flex flex-col justify-center items-center text-center ${roleInfo.color}`}>
+                                                    <div className="font-bold text-xs">{roleInfo.title}</div>
+                                                    <div className="text-[10px] opacity-70 mt-1">{personnelDB.find(p => p.code === roleInfo.holder)?.name}</div>
+                                                </div>
+                                                <div className="flex-grow relative p-4 flex items-center gap-8 overflow-x-auto">
+                                                    {roleTasks.map((task, tIndex) => (
+                                                        <div key={task.id} className="relative z-10">
+                                                            <div className={`w-48 p-3 rounded-lg border-2 shadow-sm text-right relative ${task.type === 'Control' ? 'border-red-200 bg-red-50' : task.type === 'Support' ? 'border-amber-200 bg-amber-50' : 'border-indigo-200 bg-white'}`}>
+                                                                {tIndex === 0 && rIndex === 0 && <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-2 h-2 bg-green-500 rounded-full"></div>}
+                                                                <div className="text-[10px] font-bold opacity-50 mb-1 flex justify-between">
+                                                                    <span>{task.id}</span>
+                                                                    <span className="uppercase">{task.type}</span>
+                                                                </div>
+                                                                <div className="text-xs font-bold text-slate-800 leading-tight">{task.desc}</div>
+                                                                <div className="absolute top-1/2 -left-4 transform -translate-y-1/2 text-slate-300">
+                                                                    <i className="fas fa-arrow-left"></i>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                <div className="mt-6 flex gap-4 text-xs text-slate-500 justify-center">
+                                    <span className="flex items-center gap-1"><div className="w-3 h-3 bg-white border-2 border-indigo-200 rounded"></div> وظیفه اجرایی</span>
+                                    <span className="flex items-center gap-1"><div className="w-3 h-3 bg-red-50 border-2 border-red-200 rounded"></div> نظارت/تایید</span>
+                                    <span className="flex items-center gap-1"><div className="w-3 h-3 bg-amber-50 border-2 border-amber-200 rounded"></div> پشتیبانی</span>
                                 </div>
                             </div>
-                            <i class="fas fa-chevron-down text-slate-300 transition-transform duration-300 chevron-icon"></i>
                         </div>
-                        <div class="role-details bg-slate-50 border-t border-slate-100">
-                            <div class="p-4 text-sm space-y-3">
-                                <p class="text-[10px] text-slate-500 bg-white p-2 rounded border border-slate-100 mb-2"><strong>هدف:</strong> تضمین استاندارد تدریس و کیفیت محتوای آموزشی.</p>
-                                <ul class="space-y-2 list-disc list-inside text-xs text-slate-600">
-                                    <li><strong>نظارت (QC):</strong> آبزرو کلاس‌ها و ارائه فیدبک به معلمین.</li>
-                                    <li><strong>تولید محتوا:</strong> طراحی ورک‌شیت، فلش‌کارت و طرح درس.</li>
-                                    <li><strong>آزمون:</strong> طراحی و نظارت بر امتحانات فاینال.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+                    )}
                 </div>
-
-                <!-- SECTION: ONLINE -->
-                <div class="mb-4 pt-4 border-t border-slate-200 border-dashed">
-                    <div class="flex items-center gap-2 mb-2 px-1">
-                        <i class="fas fa-wifi text-cyan-500 text-xs"></i>
-                        <h3 class="text-sm font-bold text-slate-700">شعبه آنلاین</h3>
-                    </div>
-
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden card-hover role-card cursor-pointer border-l-edu" onclick="toggleCard(this)">
-                        <div class="p-4 flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-cyan-50 text-cyan-600 flex items-center justify-center"><i class="fas fa-laptop-code"></i></div>
-                                <div>
-                                    <h3 class="font-bold text-slate-800">میس غزل & مرجان</h3>
-                                    <div class="text-xs text-cyan-600 font-bold">سوپروایزرهای آنلاین</div>
-                                </div>
-                            </div>
-                            <i class="fas fa-chevron-down text-slate-300 transition-transform duration-300 chevron-icon"></i>
-                        </div>
-                        <div class="role-details bg-slate-50 border-t border-slate-100">
-                            <div class="p-4 text-sm space-y-3">
-                                <p class="text-[10px] text-slate-500 bg-white p-2 rounded border border-slate-100 mb-2"><strong>هدف:</strong> مدیریت تجربه یادگیری دیجیتال و رفع موانع فنی.</p>
-                                <ul class="space-y-2 list-disc list-inside text-xs text-slate-600">
-                                    <li><strong>پشتیبانی فنی:</strong> مدیریت پلتفرم و رفع اشکالات اتصال.</li>
-                                    <li><strong>پایش تحصیلی:</strong> پیگیری تکالیف و ویدیوهای آفلاین.</li>
-                                    <li><strong>لجستیک:</strong> ارسال پکیج‌های پستی کتاب.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TEACHERS -->
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 shadow-sm mt-4">
-                    <h4 class="text-xs font-bold text-slate-500 mb-2"><i class="fas fa-users mr-1"></i> تیم مدرسین (Teachers)</h4>
-                    <div class="flex flex-wrap gap-1.5">
-                        <span class="badge bg-white border border-slate-200 text-slate-600">میس غزل</span>
-                        <span class="badge bg-white border border-slate-200 text-slate-600">میس هاله</span>
-                        <span class="badge bg-white border border-slate-200 text-slate-600">میس صنا</span>
-                        <span class="badge bg-white border border-slate-200 text-slate-600">میس آیدا</span>
-                        <span class="badge bg-white border border-slate-200 text-slate-600">میس پرنیان</span>
-                        <span class="badge bg-white border border-slate-200 text-slate-600">...</span>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="mt-12 text-center text-[10px] text-slate-400">
-            © 2024 EnglishLand Organization | Internal Document
-        </div>
-
-    </main>
-
-    <script>
-        function toggleCard(element) {
-            if (element.classList.contains('active')) {
-                element.classList.remove('active');
-            } else {
-                element.classList.add('active');
-            }
+            );
         }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<EnglishLandBPM />);
     </script>
 </body>
 </html>
