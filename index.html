@@ -183,6 +183,9 @@
             { id: 'BP-25', name: 'پشتیبانی آنلاین', owner: 'R-EDU', description: 'رفع مشکلات فنی پلتفرم و کلاس مجازی.' },
             { id: 'BP-26', name: 'پشتیبانی آفلاین', owner: 'R-REC-S', description: 'پیگیری تلفنی غیبت و تکالیف.' },
             { id: 'BP-27', name: 'پشتیبانی معلمین', owner: 'R-INT', description: 'تکثیر ورک‌شیت، ماژیک و امکانات کلاس.' },
+            
+            // R&D Process Added Here
+            { id: 'BP-28', name: 'تحقیق و توسعه (R&D)', owner: 'R-CEO', description: 'طراحی محصولات جدید، سیستم‌سازی و ایده‌پردازی.' },
         ];
 
         const tasksDB = [
@@ -328,6 +331,13 @@
             { id: 'T27-1', pid: 'BP-27', role: 'R-ADM', type: 'Main', desc: 'دریافت فایل ورک‌شیت و تکثیر (کپی)', freq: 'روزانه' },
             { id: 'T27-2', pid: 'BP-27', role: 'R-ADM', type: 'Main', desc: 'شارژ ماژیک و تمیز کردن تخته‌ها', freq: 'روزانه' },
             { id: 'T27-3', pid: 'BP-27', role: 'R-SUP-H', type: 'Control', desc: 'بررسی کیفیت اقلام کمک آموزشی', freq: 'هفتگی' },
+
+            // --- BP-28 R&D (تحقیق و توسعه) - ADDED ---
+            { id: 'T28-1', pid: 'BP-28', role: 'R-MKT', type: 'Main', desc: 'ایده‌پردازی و پیشنهاد کورس‌های جدید', freq: 'فصلی' },
+            { id: 'T28-2', pid: 'BP-28', role: 'R-FIN', type: 'Main', desc: 'امکان‌سنجی مالی و مدل‌سازی سودآوری پروژه', freq: 'موردی' },
+            { id: 'T28-3', pid: 'BP-28', role: 'R-EDU', type: 'Support', desc: 'بررسی تطابق ایده با استانداردهای آموزشی', freq: 'موردی' },
+            { id: 'T28-4', pid: 'BP-28', role: 'R-INT', type: 'Support', desc: 'بررسی زیرساخت اجرایی و عملیاتی', freq: 'موردی' },
+            { id: 'T28-5', pid: 'BP-28', role: 'R-CEO', type: 'Control', desc: 'تصویب نهایی طرح و دستور اجرا (Pilot)', freq: 'موردی' },
         ];
 
         function EnglishLandBPM() {
@@ -395,7 +405,7 @@
                                 سیستم مدیریت فرآیند <span className="text-yellow-600">EnglishLand</span>
                             </h1>
                             <p className="text-sm text-slate-500 mt-2 font-bold">
-                                پوشش جامع ۲۷ فرآیند کلیدی (نسخه ERP)
+                                پوشش جامع ۲۸ فرآیند کلیدی (نسخه ERP)
                             </p>
                         </div>
                         <div className="flex bg-slate-100 p-1 rounded-xl overflow-x-auto max-w-full">
