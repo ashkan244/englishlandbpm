@@ -18,18 +18,80 @@
     <!-- 4. Load Babel for JSX support -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- 5. Load Vazirmatn Font (Beautiful Persian Font) -->
+    <!-- 5. Load Vazirmatn Font -->
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
 
     <style>
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
         }
-        /* Hide scrollbar for clean UI */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Tree Chart Styles */
+        .tree {
+            white-space: nowrap;
+            overflow-x: auto;
+            min-width: 800px;
+            padding-bottom: 50px;
+            display: flex;
+            justify-content: center;
+        }
+        .tree ul {
+            padding-top: 20px; position: relative; transition: all 0.5s; display: flex; justify-content: center;
+        }
+        .tree li {
+            float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 5px 0 5px; transition: all 0.5s;
+        }
+        /* Connectors */
+        .tree li::before, .tree li::after {
+            content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #cbd5e1; width: 50%; height: 20px;
+        }
+        .tree li::after {
+            right: auto; left: 50%; border-left: 2px solid #cbd5e1;
+        }
+        .tree li:only-child::after, .tree li:only-child::before {
+            display: none;
+        }
+        .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after {
+            border: 0 none;
+        }
+        .tree li:last-child::before {
+            border-right: 2px solid #cbd5e1; border-radius: 0 5px 0 0;
+        }
+        .tree li:first-child::after {
+            border-radius: 5px 0 0 0;
+        }
+        .tree ul ul::before {
+            content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #cbd5e1; width: 0; height: 20px;
+        }
+        /* Card Style */
+        .tree-card {
+            background: white; 
+            border: 1px solid #e2e8f0; 
+            padding: 10px; 
+            border-radius: 12px; 
+            display: inline-block; 
+            min-width: 140px;
+            text-decoration: none;
+            color: #334155; 
+            font-size: 0.8rem; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            transition: all 0.2s; 
+            position: relative;
+            z-index: 10;
+        }
+        .tree-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); 
+            border-color: #6366f1; 
+            z-index: 20;
+        }
     </style>
 </head>
 <body>
@@ -44,21 +106,26 @@
 
         const rolesDB = [
             // C-Level
-            { id: 'R-CEO', title: 'مدیر عامل (CEO)', parent: null, holder: 'P-01', color: 'bg-amber-100 border-amber-300 text-amber-800' },
+            { id: 'R-CEO', title: 'مدیر عامل (CEO)', parent: null, holder: 'P-01', color: 'bg-amber-50 border-amber-300 text-amber-900' },
             
             // Functional Heads
-            { id: 'R-INT', title: 'مدیر داخلی & HR', parent: 'R-CEO', holder: 'P-02', color: 'bg-indigo-100 border-indigo-300 text-indigo-800' },
-            { id: 'R-FIN', title: 'مدیر مالی', parent: 'R-CEO', holder: 'P-03', color: 'bg-emerald-100 border-emerald-300 text-emerald-800' },
-            { id: 'R-MKT', title: 'مدیر مارکتینگ', parent: 'R-CEO', holder: 'P-04', color: 'bg-pink-100 border-pink-300 text-pink-800' },
-            { id: 'R-EDU', title: 'مدیر آموزش', parent: 'R-CEO', holder: 'P-05', color: 'bg-red-100 border-red-300 text-red-800' },
+            { id: 'R-INT', title: 'مدیر داخلی & HR', parent: 'R-CEO', holder: 'P-02', color: 'bg-indigo-50 border-indigo-300 text-indigo-900' },
+            { id: 'R-FIN', title: 'مدیر مالی', parent: 'R-CEO', holder: 'P-03', color: 'bg-emerald-50 border-emerald-300 text-emerald-900' },
+            { id: 'R-MKT', title: 'مدیر مارکتینگ', parent: 'R-CEO', holder: 'P-04', color: 'bg-pink-50 border-pink-300 text-pink-900' },
+            { id: 'R-EDU', title: 'مدیر آموزش', parent: 'R-CEO', holder: 'P-05', color: 'bg-red-50 border-red-300 text-red-900' },
 
             // Operational
-            { id: 'R-SUP-H', title: 'سوپروایزر حضوری', parent: 'R-EDU', holder: 'P-06', color: 'bg-slate-100 border-slate-300 text-slate-700' },
-            { id: 'R-SUP-O', title: 'سوپروایزر آنلاین', parent: 'R-EDU', holder: 'P-07', color: 'bg-slate-100 border-slate-300 text-slate-700' },
-            { id: 'R-REC-S', title: 'سرپرست پذیرش', parent: 'R-INT', holder: 'P-08', color: 'bg-slate-100 border-slate-300 text-slate-700' },
-            { id: 'R-ADM', title: 'مسئول اداری', parent: 'R-INT', holder: 'P-09', color: 'bg-slate-100 border-slate-300 text-slate-700' },
-            { id: 'R-SAL', title: 'کارشناس فروش', parent: 'R-MKT', holder: 'P-10', color: 'bg-slate-100 border-slate-300 text-slate-700' },
-            { id: 'R-EVT', title: 'مدیر رویداد', parent: 'R-MKT', holder: 'P-11', color: 'bg-slate-100 border-slate-300 text-slate-700' },
+            { id: 'R-SUP-H', title: 'سوپروایزر حضوری', parent: 'R-EDU', holder: 'P-06', color: 'bg-white border-slate-200' },
+            { id: 'R-SUP-O', title: 'سوپروایزر آنلاین', parent: 'R-EDU', holder: 'P-07', color: 'bg-white border-slate-200' },
+            { id: 'R-REC-S', title: 'سرپرست پذیرش', parent: 'R-INT', holder: 'P-08', color: 'bg-white border-slate-200' },
+            { id: 'R-ADM', title: 'مسئول اداری', parent: 'R-INT', holder: 'P-09', color: 'bg-white border-slate-200' },
+            { id: 'R-SAL', title: 'کارشناس فروش', parent: 'R-MKT', holder: 'P-10', color: 'bg-white border-slate-200' },
+            { id: 'R-EVT', title: 'مدیر رویداد', parent: 'R-MKT', holder: 'P-11', color: 'bg-white border-slate-200' },
+
+            // Extended Tree Nodes (For Visual Completeness)
+            { id: 'R-TCH-H', title: 'مدرسین حضوری', parent: 'R-SUP-H', holder: 'P-TCH', color: 'bg-slate-50 border-dashed border-slate-300 text-slate-500' },
+            { id: 'R-TCH-O', title: 'مدرسین آنلاین', parent: 'R-SUP-O', holder: 'P-TCH', color: 'bg-slate-50 border-dashed border-slate-300 text-slate-500' },
+            { id: 'R-SRV', title: 'نیروی خدمات', parent: 'R-ADM', holder: 'P-SRV', color: 'bg-slate-50 border-dashed border-slate-300 text-slate-500' },
         ];
 
         const personnelDB = [
@@ -73,6 +140,8 @@
             { code: 'P-09', name: 'میس زهرا', lineManager: 'P-02' },
             { code: 'P-10', name: 'میس شیرین', lineManager: 'P-04' },
             { code: 'P-11', name: 'میس پرنیان', lineManager: 'P-04' },
+            { code: 'P-TCH', name: 'تیم اساتید', lineManager: null },
+            { code: 'P-SRV', name: 'پرسنل خدمات', lineManager: null },
         ];
 
         const processesDB = [
@@ -124,14 +193,14 @@
             { id: 'T1-4', pid: 'BP-01', role: 'R-ADM', type: 'Main', desc: 'دریافت مدارک و تکمیل پرونده', freq: 'روزانه' },
             { id: 'T1-5', pid: 'BP-01', role: 'R-REC-S', type: 'Control', desc: 'تایید نهایی پرونده و ثبت‌نام', freq: 'روزانه' },
 
-            // --- BP-03 Quality Assurance (تضمین کیفیت) - DEEP DIVE ---
+            // --- BP-03 Quality Assurance ---
             { id: 'T3-1', pid: 'BP-03', role: 'R-SUP-H', type: 'Main', desc: 'تدوین جدول زمان‌بندی آبزرو ترمیک', freq: 'ماهانه' },
             { id: 'T3-2', pid: 'BP-03', role: 'R-SUP-H', type: 'Main', desc: 'حضور در کلاس و تکمیل چک‌لیست استاندارد', freq: 'هفتگی' },
             { id: 'T3-3', pid: 'BP-03', role: 'R-EDU', type: 'Control', desc: 'بررسی گزارش‌های آبزرو و امتیازدهی', freq: 'هفتگی' },
             { id: 'T3-4', pid: 'BP-03', role: 'R-SUP-H', type: 'Main', desc: 'جلسه بازخورد (Feedback) خصوصی با معلم', freq: 'هفتگی' },
             { id: 'T3-5', pid: 'BP-03', role: 'R-EDU', type: 'Main', desc: 'نیازسنجی برای ورکشاپ‌های ضمن خدمت', freq: 'فصلی' },
 
-            // --- BP-04 Petty Cash (مدیریت تنخواه) - DEEP DIVE ---
+            // --- BP-04 Petty Cash ---
             { id: 'T4-1', pid: 'BP-04', role: 'R-ADM', type: 'Main', desc: 'ثبت درخواست خرید کالا/خدمات', freq: 'روزانه' },
             { id: 'T4-2', pid: 'BP-04', role: 'R-INT', type: 'Control', desc: 'تایید ضرورت خرید و انطباق با بودجه', freq: 'روزانه' },
             { id: 'T4-3', pid: 'BP-04', role: 'R-ADM', type: 'Main', desc: 'انجام خرید و دریافت فاکتور معتبر', freq: 'روزانه' },
@@ -139,7 +208,7 @@
             { id: 'T4-5', pid: 'BP-04', role: 'R-FIN', type: 'Control', desc: 'سندرسی فاکتورها و مغایرت‌گیری', freq: 'هفتگی' },
             { id: 'T4-6', pid: 'BP-04', role: 'R-FIN', type: 'Main', desc: 'شارژ مجدد حساب تنخواه گردان', freq: 'هفتگی' },
 
-            // --- BP-05 Complaints (مدیریت شکایات) - DEEP DIVE ---
+            // --- BP-05 Complaints ---
             { id: 'T5-1', pid: 'BP-05', role: 'R-REC-S', type: 'Main', desc: 'دریافت شکایت و ثبت در فرم CRM', freq: 'موردی' },
             { id: 'T5-2', pid: 'BP-05', role: 'R-REC-S', type: 'Support', desc: 'آرام‌سازی اولیه (De-escalation)', freq: 'موردی' },
             { id: 'T5-3', pid: 'BP-05', role: 'R-INT', type: 'Main', desc: 'بررسی ریشه‌ای و مصاحبه با افراد درگیر', freq: 'موردی' },
@@ -147,7 +216,7 @@
             { id: 'T5-5', pid: 'BP-05', role: 'R-INT', type: 'Main', desc: 'تماس با شاکی و اعلام نتیجه نهایی', freq: 'موردی' },
             { id: 'T5-6', pid: 'BP-05', role: 'R-CEO', type: 'Control', desc: 'پایش آمار شکایات برای اصلاح سیستم', freq: 'ماهانه' },
 
-            // --- BP-08 Class Planning (برنامه‌ریزی کلاس) - DEEP DIVE ---
+            // --- BP-08 Class Planning ---
             { id: 'T8-1', pid: 'BP-08', role: 'R-REC-S', type: 'Support', desc: 'استخراج آمار پیش‌ثبت‌نام و لیست انتظار', freq: 'فصلی' },
             { id: 'T8-2', pid: 'BP-08', role: 'R-SUP-H', type: 'Main', desc: 'دریافت زمان‌های آزاد معلمین (Availability)', freq: 'فصلی' },
             { id: 'T8-3', pid: 'BP-08', role: 'R-SUP-H', type: 'Main', desc: 'چیدمان اولیه جدول کلاس‌ها (روز/ساعت)', freq: 'فصلی' },
@@ -155,14 +224,14 @@
             { id: 'T8-5', pid: 'BP-08', role: 'R-ADM', type: 'Main', desc: 'ورود اطلاعات کلاس‌ها در سیستم (LIMS)', freq: 'فصلی' },
             { id: 'T8-6', pid: 'BP-08', role: 'R-SAL', type: 'Main', desc: 'انتشار تقویم ترم جدید برای والدین', freq: 'فصلی' },
 
-            // --- BP-09 Class Merger (ادغام کلاس) - DEEP DIVE ---
+            // --- BP-09 Class Merger ---
             { id: 'T9-1', pid: 'BP-09', role: 'R-ADM', type: 'Main', desc: 'گزارش کلاس‌های زیر حد نصاب (هفته اول)', freq: 'آغاز ترم' },
             { id: 'T9-2', pid: 'BP-09', role: 'R-EDU', type: 'Control', desc: 'تصمیم‌گیری برای ادغام یا انحلال', freq: 'آغاز ترم' },
             { id: 'T9-3', pid: 'BP-09', role: 'R-SAL', type: 'Main', desc: 'تماس حساس با والدین و پیشنهاد جایگزین', freq: 'آغاز ترم' },
             { id: 'T9-4', pid: 'BP-09', role: 'R-ADM', type: 'Main', desc: 'ویرایش سیستم و انتقال دانش‌آموزان', freq: 'آغاز ترم' },
             { id: 'T9-5', pid: 'BP-09', role: 'R-FIN', type: 'Support', desc: 'محاسبه مابه‌التفاوت شهریه (در صورت تغییر)', freq: 'آغاز ترم' },
 
-            // --- BP-10 Advertising (تبلیغات) - DEEP DIVE ---
+            // --- BP-10 Advertising ---
             { id: 'T10-1', pid: 'BP-10', role: 'R-MKT', type: 'Main', desc: 'تدوین استراتژی کمپین (هدف و پیام)', freq: 'فصلی' },
             { id: 'T10-2', pid: 'BP-10', role: 'R-FIN', type: 'Control', desc: 'بررسی و تصویب بودجه تبلیغاتی', freq: 'فصلی' },
             { id: 'T10-3', pid: 'BP-10', role: 'R-EVT', type: 'Support', desc: 'تولید محتوای بصری (بنر/تیزر)', freq: 'فصلی' },
@@ -170,7 +239,7 @@
             { id: 'T10-5', pid: 'BP-10', role: 'R-SAL', type: 'Main', desc: 'ثبت دقیق ورودی‌ها (Leads) و منبع جذب', freq: 'روزانه' },
             { id: 'T10-6', pid: 'BP-10', role: 'R-MKT', type: 'Control', desc: 'تحلیل نرخ تبدیل و هزینه جذب (CAC)', freq: 'پایان کمپین' },
 
-            // --- BP-11 Social Media (سوشال مدیا) - DEEP DIVE ---
+            // --- BP-11 Social Media ---
             { id: 'T11-1', pid: 'BP-11', role: 'R-MKT', type: 'Main', desc: 'تدوین تقویم محتوایی ماهانه', freq: 'ماهانه' },
             { id: 'T11-2', pid: 'BP-11', role: 'R-EVT', type: 'Main', desc: 'هماهنگی و ضبط ویدیو از کلاس‌ها', freq: 'هفتگی' },
             { id: 'T11-3', pid: 'BP-11', role: 'R-MKT', type: 'Support', desc: 'تدوین و گرافیک پست‌ها', freq: 'هفتگی' },
@@ -178,7 +247,7 @@
             { id: 'T11-5', pid: 'BP-11', role: 'R-SAL', type: 'Main', desc: 'پاسخگویی به کامنت و دایرکت (تعامل)', freq: 'روزانه' },
             { id: 'T11-6', pid: 'BP-11', role: 'R-MKT', type: 'Control', desc: 'تحلیل اینسایت و رشد پیج', freq: 'ماهانه' },
 
-            // Other Processes (Briefly filled to maintain functionality)
+            // Other Processes
             { id: 'T6', pid: 'BP-07', role: 'R-REC-S', type: 'Main', desc: 'ارسال کارکرد اداری', freq: 'ماهانه' },
             { id: 'T7', pid: 'BP-07', role: 'R-EDU', type: 'Main', desc: 'ارسال کارکرد معلمین', freq: 'ماهانه' },
             { id: 'T8', pid: 'BP-07', role: 'R-FIN', type: 'Main', desc: 'محاسبه فیش حقوقی', freq: 'ماهانه' },
@@ -289,6 +358,32 @@
                 return personnelDB.find(p => p.code === role.holder)?.name || 'ناشناس';
             };
 
+            // Recursive function to render the tree
+            const renderTree = (parentId) => {
+                const children = rolesDB.filter(r => r.parent === parentId);
+                if (children.length === 0) return null;
+                return (
+                    <ul>
+                        {children.map(child => {
+                            const person = personnelDB.find(p => p.code === child.holder);
+                            return (
+                                <li key={child.id}>
+                                    <div className={`tree-card ${child.color || 'bg-white border-slate-200'}`}>
+                                        <div className="flex justify-between items-center mb-1 border-b border-black/5 pb-1">
+                                            <span className="text-[10px] font-mono opacity-50">{child.id}</span>
+                                            <span className="text-[10px] font-bold bg-white/50 px-1 rounded text-slate-600">{child.holder}</span>
+                                        </div>
+                                        <div className="font-bold text-sm text-slate-800 py-1">{person?.name}</div>
+                                        <div className="text-xs text-slate-500">{child.title}</div>
+                                    </div>
+                                    {renderTree(child.id)}
+                                </li>
+                            );
+                        })}
+                    </ul>
+                )
+            }
+
             return (
                 <div className="min-h-screen bg-slate-100 font-sans text-slate-800 p-4 lg:p-6" dir="rtl">
                     
@@ -386,12 +481,14 @@
                                     </div>
                                 </div>
                                 <div className="space-y-2 h-[600px] overflow-y-auto">
-                                    {rolesDB.map(role => {
+                                    {rolesDB.filter(r => r.id.startsWith('R-')).map(role => {
                                         const p = personnelDB.find(x => x.code === role.holder);
                                         return (
                                             <button key={role.id} onClick={() => setSelectedRoleForJD(role.id)} className={`w-full text-right p-3 rounded-xl border transition-all ${selectedRoleForJD === role.id ? 'bg-indigo-50 border-indigo-300 shadow-sm' : 'bg-white border-slate-100 hover:bg-slate-50'}`}>
-                                                <div className="font-bold text-slate-700 text-sm">{p.name}</div>
-                                                <div className="text-xs text-slate-500">{role.title}</div>
+                                                <div className="font-bold text-slate-700 text-sm">{p?.name || 'موقعیت خالی'}</div>
+                                                <div className="text-xs text-slate-500">
+                                                    {role.title} <span className="font-mono text-[9px] bg-slate-100 px-1 rounded text-slate-400">{role.id}</span>
+                                                </div>
                                             </button>
                                         )
                                     })}
@@ -402,14 +499,17 @@
                                     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 min-h-[600px]">
                                         <div className="flex items-center gap-4 mb-8 pb-6 border-b border-slate-100">
                                             <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-2xl font-bold">
-                                                {personnelDB.find(p => p.code === rolesDB.find(r => r.id === selectedRoleForJD).holder).name.charAt(0)}
+                                                {personnelDB.find(p => p.code === rolesDB.find(r => r.id === selectedRoleForJD).holder)?.name.charAt(0) || '?'}
                                             </div>
                                             <div>
                                                 <h2 className="text-2xl font-black text-slate-800">
-                                                    {personnelDB.find(p => p.code === rolesDB.find(r => r.id === selectedRoleForJD).holder).name}
+                                                    {personnelDB.find(p => p.code === rolesDB.find(r => r.id === selectedRoleForJD).holder)?.name || 'موقعیت خالی'}
                                                 </h2>
                                                 <div className="text-indigo-600 font-bold bg-indigo-50 px-3 py-1 rounded-full text-sm inline-block mt-2">
                                                     {rolesDB.find(r => r.id === selectedRoleForJD).title}
+                                                    <span className="mr-2 text-indigo-400 text-xs border-r border-indigo-200 pr-2 font-mono">
+                                                        {selectedRoleForJD}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
@@ -440,35 +540,28 @@
                         </div>
                     )}
 
-                    {/* TAB 3: ORG CHART */}
+                    {/* TAB 3: ORG CHART (Dynamic) */}
                     {activeTab === 'org' && (
                         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-10 overflow-x-auto text-center" dir="ltr">
-                            <div className="inline-flex flex-col items-center">
-                                <div className="bg-amber-50 border-2 border-amber-300 p-4 rounded-xl w-48 mb-8 relative z-10 shadow-sm">
-                                    <div className="font-bold text-amber-900">Dr. Bahareh</div>
-                                    <div className="text-xs text-amber-600">CEO</div>
-                                    <div className="absolute -bottom-8 left-1/2 w-px h-8 bg-slate-300"></div>
-                                </div>
-                                <div className="flex gap-6 relative pt-4">
-                                    <div className="absolute top-0 left-10 right-10 h-px bg-slate-300"></div>
-                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-4 bg-slate-300"></div>
-                                    {[
-                                        { name: 'Ghazal', role: 'Internal Mgr', color: 'border-indigo-400 bg-white' },
-                                        { name: 'Ashkan', role: 'Marketing Mgr', color: 'border-pink-400 bg-white' },
-                                        { name: 'Iman', role: 'Finance Mgr', color: 'border-emerald-400 bg-white' },
-                                        { name: 'Edu Dept', role: 'Supervisors', color: 'border-red-400 bg-white' }
-                                    ].map((mgr, i) => (
-                                        <div key={i} className="relative pt-4 flex flex-col items-center">
-                                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-4 bg-slate-300"></div>
-                                            <div className={`border-b-4 p-3 rounded-xl shadow-sm w-40 ${mgr.color}`}>
-                                                <div className="font-bold text-slate-700">{mgr.name}</div>
-                                                <div className="text-xs text-slate-500">{mgr.role}</div>
-                                            </div>
-                                            <div className="w-px h-4 bg-slate-200 mt-1"></div>
-                                            <div className="text-[10px] text-slate-300">▼</div>
-                                        </div>
-                                    ))}
-                                </div>
+                            <div className="tree">
+                                <ul>
+                                    {rolesDB.filter(r => r.parent === null).map(rootRole => {
+                                        const rootPerson = personnelDB.find(p => p.code === rootRole.holder);
+                                        return (
+                                            <li key={rootRole.id}>
+                                                <div className={`tree-card ${rootRole.color}`}>
+                                                    <div className="flex justify-between items-center mb-1 border-b border-black/5 pb-1">
+                                                        <span className="text-[10px] font-mono opacity-50">{rootRole.id}</span>
+                                                        <span className="text-[10px] font-bold bg-white/50 px-1 rounded text-slate-600">{rootRole.holder}</span>
+                                                    </div>
+                                                    <div className="font-bold text-lg text-slate-800 py-1">{rootPerson?.name}</div>
+                                                    <div className="text-xs text-slate-500">{rootRole.title}</div>
+                                                </div>
+                                                {renderTree(rootRole.id)}
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
                             </div>
                         </div>
                     )}
