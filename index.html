@@ -3,95 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سیستم مدیریت فرآیند EnglishLand</title>
+    <title>سیستم جامع مدیریت فرآیند EnglishLand</title>
     
-    <!-- 1. Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- 2. Load FontAwesome for Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- 3. Load React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    
-    <!-- 4. Load Babel for JSX support -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <!-- 5. Load Vazirmatn Font -->
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            font-family: 'Vazirmatn', sans-serif;
-            background-color: #f8fafc;
-        }
-        /* Custom Scrollbar */
+        body { font-family: 'Vazirmatn', sans-serif; background-color: #f8fafc; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* Tree Chart Styles */
-        .tree {
-            white-space: nowrap;
-            overflow-x: auto;
-            min-width: 800px;
-            padding-bottom: 50px;
-            display: flex;
-            justify-content: center;
-        }
-        .tree ul {
-            padding-top: 20px; position: relative; transition: all 0.5s; display: flex; justify-content: center;
-        }
-        .tree li {
-            float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 5px 0 5px; transition: all 0.5s;
-        }
-        /* Connectors */
-        .tree li::before, .tree li::after {
-            content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #cbd5e1; width: 50%; height: 20px;
-        }
-        .tree li::after {
-            right: auto; left: 50%; border-left: 2px solid #cbd5e1;
-        }
-        .tree li:only-child::after, .tree li:only-child::before {
-            display: none;
-        }
+        
+        .tree { white-space: nowrap; overflow-x: auto; min-width: 800px; padding-bottom: 50px; display: flex; justify-content: center; }
+        .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; }
+        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 5px 0 5px; }
+        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #cbd5e1; width: 50%; height: 20px; }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid #cbd5e1; }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; }
         .tree li:only-child { padding-top: 0; }
-        .tree li:first-child::before, .tree li:last-child::after {
-            border: 0 none;
-        }
-        .tree li:last-child::before {
-            border-right: 2px solid #cbd5e1; border-radius: 0 5px 0 0;
-        }
-        .tree li:first-child::after {
-            border-radius: 5px 0 0 0;
-        }
-        .tree ul ul::before {
-            content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #cbd5e1; width: 0; height: 20px;
-        }
-        /* Card Style */
-        .tree-card {
-            background: white; 
-            border: 1px solid #e2e8f0; 
-            padding: 10px; 
-            border-radius: 12px; 
-            display: inline-block; 
-            min-width: 140px;
-            text-decoration: none;
-            color: #334155; 
-            font-size: 0.8rem; 
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            transition: all 0.2s; 
-            position: relative;
-            z-index: 10;
-        }
-        .tree-card:hover { 
-            transform: translateY(-5px); 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); 
-            border-color: #6366f1; 
-            z-index: 20;
-        }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid #cbd5e1; border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #cbd5e1; width: 0; height: 20px; }
+        .tree-card { background: white; border: 1px solid #e2e8f0; padding: 10px; border-radius: 12px; display: inline-block; min-width: 140px; text-decoration: none; color: #334155; font-size: 0.8rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: all 0.2s; position: relative; z-index: 10; }
+        .tree-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: #6366f1; z-index: 20; }
     </style>
 </head>
 <body>
@@ -100,34 +40,28 @@
     <script type="text/babel">
         const { useState, useMemo } = React;
 
-        // ==========================================
-        // 1. DATABASE
-        // ==========================================
-
+        // 1. ROLES DATABASE
         const rolesDB = [
-            // C-Level
             { id: 'R-CEO', title: 'مدیر عامل (CEO)', parent: null, holder: 'P-01', color: 'bg-amber-50 border-amber-300 text-amber-900' },
-            
-            // Functional Heads
             { id: 'R-INT', title: 'مدیر داخلی & HR', parent: 'R-CEO', holder: 'P-02', color: 'bg-indigo-50 border-indigo-300 text-indigo-900' },
             { id: 'R-FIN', title: 'مدیر مالی', parent: 'R-CEO', holder: 'P-03', color: 'bg-emerald-50 border-emerald-300 text-emerald-900' },
             { id: 'R-MKT', title: 'مدیر مارکتینگ', parent: 'R-CEO', holder: 'P-04', color: 'bg-pink-50 border-pink-300 text-pink-900' },
             { id: 'R-EDU', title: 'سوپروایزر آموزشی', parent: 'R-CEO', holder: 'P-05', color: 'bg-red-50 border-red-300 text-red-900' },
-
-            // Operational
-            { id: 'R-SUP-H', title: 'کارشناس آموزشی', parent: 'R-EDU', holder: 'P-06', color: 'bg-white border-slate-200' },
-            { id: 'R-SUP-O', title: 'کارشناس آموزشی', parent: 'R-EDU', holder: 'P-07', color: 'bg-white border-slate-200' },
+            
+            { id: 'R-SUP-H', title: 'کارشناس آموزشی (H)', parent: 'R-EDU', holder: 'P-06', color: 'bg-white border-slate-200' },
+            { id: 'R-SUP-O', title: 'کارشناس آموزشی (O)', parent: 'R-EDU', holder: 'P-07', color: 'bg-white border-slate-200' },
             { id: 'R-REC-S', title: 'سرپرست پذیرش', parent: 'R-INT', holder: 'P-08', color: 'bg-white border-slate-200' },
             { id: 'R-ADM', title: 'مسئول اداری', parent: 'R-INT', holder: 'P-09', color: 'bg-white border-slate-200' },
             { id: 'R-SAL', title: 'کارشناس فروش', parent: 'R-MKT', holder: 'P-10', color: 'bg-white border-slate-200' },
             { id: 'R-EVT', title: 'مدیر رویداد', parent: 'R-MKT', holder: 'P-11', color: 'bg-white border-slate-200' },
 
-            // Extended Tree Nodes (For Visual Completeness)
+            // Leaf nodes for chart completeness
             { id: 'R-TCH-H', title: 'مدرسین حضوری', parent: 'R-SUP-H', holder: 'P-TCH', color: 'bg-slate-50 border-dashed border-slate-300 text-slate-500' },
             { id: 'R-TCH-O', title: 'مدرسین آنلاین', parent: 'R-SUP-O', holder: 'P-TCH', color: 'bg-slate-50 border-dashed border-slate-300 text-slate-500' },
             { id: 'R-SRV', title: 'نیروی خدمات', parent: 'R-ADM', holder: 'P-SRV', color: 'bg-slate-50 border-dashed border-slate-300 text-slate-500' },
         ];
 
+        // 2. PERSONNEL DATABASE
         const personnelDB = [
             { code: 'P-01', name: 'دکتر بهاره', lineManager: null },
             { code: 'P-02', name: 'میس غزال', lineManager: 'P-01' },
@@ -144,37 +78,27 @@
             { code: 'P-SRV', name: 'پرسنل خدمات', lineManager: null },
         ];
 
+        // 3. PROCESS DEFINITIONS (35 Processes)
         const processesDB = [
-            // Core Ops
             { id: 'BP-01', name: 'جذب و ثبت‌نام', owner: 'R-MKT', description: 'مسیر تبدیل تماس تلفنی به دانش‌آموز.' },
             { id: 'BP-02', name: 'برگزاری رویداد', owner: 'R-EVT', description: 'طراحی و اجرای ایونت‌های مناسبتی.' },
-            { id: 'BP-03', name: 'تضمین کیفیت آموزش', owner: 'R-EDU', description: 'آبزرو کلاس‌ها، فیدبک به معلم و اصلاح طرح درس.' },
-            { id: 'BP-04', name: 'مدیریت تنخواه و خرید', owner: 'R-FIN', description: 'فرآیند درخواست خرید، تایید و پرداخت هزینه‌های جاری.' },
-            { id: 'BP-05', name: 'مدیریت شکایات (CRM)', owner: 'R-INT', description: 'دریافت، بررسی و حل‌وفصل اعتراضات والدین.' },
+            { id: 'BP-03', name: 'تضمین کیفیت آموزش', owner: 'R-EDU', description: 'آبزرو کلاس‌ها و فیدبک به معلم.' },
+            { id: 'BP-04', name: 'مدیریت تنخواه و خرید', owner: 'R-FIN', description: 'مدیریت هزینه‌های جاری.' },
+            { id: 'BP-05', name: 'مدیریت شکایات (CRM)', owner: 'R-INT', description: 'رسیدگی به اعتراضات والدین.' },
             { id: 'BP-06', name: 'تدارکات و نظافت', owner: 'R-INT', description: 'نظافت محیط و تامین ملزومات.' },
-
-            // HR & Planning
             { id: 'BP-07', name: 'حقوق و دستمزد', owner: 'R-FIN', description: 'محاسبه ساعات کار و پرداخت حقوق.' },
-            { id: 'BP-08', name: 'برنامه‌ریزی کلاس', owner: 'R-EDU', description: 'نیازسنجی، جدول‌بندی زمانی و اختصاص معلم.' },
-            { id: 'BP-09', name: 'ادغام کلاس‌ها', owner: 'R-EDU', description: 'تعیین تکلیف کلاس‌های زیر حد نصاب و جابجایی.' },
-            
-            // Marketing
-            { id: 'BP-10', name: 'تبلیغات و کمپین', owner: 'R-MKT', description: 'طراحی و انتشار تبلیغات محیطی/دیجیتال و بودجه‌بندی.' },
-            { id: 'BP-11', name: 'سوشال مدیا', owner: 'R-MKT', description: 'تقویم محتوایی، تولید و انتشار پست/استوری.' },
-
-            // HR Ops
+            { id: 'BP-08', name: 'برنامه‌ریزی کلاس', owner: 'R-EDU', description: 'نیازسنجی و زمان‌بندی ترم جدید.' },
+            { id: 'BP-09', name: 'ادغام کلاس‌ها', owner: 'R-EDU', description: 'مدیریت کلاس‌های زیر حد نصاب.' },
+            { id: 'BP-10', name: 'تبلیغات و کمپین', owner: 'R-MKT', description: 'طراحی و انتشار تبلیغات.' },
+            { id: 'BP-11', name: 'سوشال مدیا', owner: 'R-MKT', description: 'تقویم محتوایی و انتشار پست/استوری.' },
             { id: 'BP-12', name: 'درخواست مرخصی', owner: 'R-INT', description: 'ثبت و تایید مرخصی و جایگزینی.' },
             { id: 'BP-13', name: 'درخواست مساعده', owner: 'R-FIN', description: 'درخواست وام یا پیش‌پرداخت.' },
             { id: 'BP-14', name: 'استخدام اداری', owner: 'R-INT', description: 'جذب نیروهای ستادی.' },
             { id: 'BP-15', name: 'استخدام معلم', owner: 'R-EDU', description: 'فراخوان و دمو معلمین.' },
             { id: 'BP-16', name: 'فرآیند انضباطی', owner: 'R-INT', description: 'رسیدگی به تخلفات و اعمال قانون.' },
-
-            // Crisis & Strategy
             { id: 'BP-17', name: 'مدیریت بحران', owner: 'R-CEO', description: 'مدیریت شرایط اضطراری سازمانی.' },
             { id: 'BP-18', name: 'حوادث آنی', owner: 'R-INT', description: 'واکنش سریع به حوادث فیزیکی.' },
             { id: 'BP-19', name: 'سیاست‌گذاری کلان', owner: 'R-CEO', description: 'تعیین اهداف سالانه.' },
-
-            // NEW PROCESSES
             { id: 'BP-20', name: 'تولید کلیپ آموزشی', owner: 'R-EDU', description: 'سناریو، ضبط، تدوین و انتشار کلیپ.' },
             { id: 'BP-21', name: 'بایگانی اسناد', owner: 'R-INT', description: 'بایگانی فیزیکی و دیجیتال پرونده‌ها.' },
             { id: 'BP-22', name: 'زیرساخت و سیستم', owner: 'R-INT', description: 'آپدیت LIMS، سخت‌افزار و شبکه.' },
@@ -183,161 +107,197 @@
             { id: 'BP-25', name: 'پشتیبانی آنلاین', owner: 'R-EDU', description: 'رفع مشکلات فنی پلتفرم و کلاس مجازی.' },
             { id: 'BP-26', name: 'پشتیبانی آفلاین', owner: 'R-REC-S', description: 'پیگیری تلفنی غیبت و تکالیف.' },
             { id: 'BP-27', name: 'پشتیبانی معلمین', owner: 'R-INT', description: 'تکثیر ورک‌شیت، ماژیک و امکانات کلاس.' },
-            
-            // R&D Process Added Here
-            { id: 'BP-28', name: 'تحقیق و توسعه (R&D)', owner: 'R-CEO', description: 'طراحی محصولات جدید، سیستم‌سازی و ایده‌پردازی.' },
+            { id: 'BP-28', name: 'تحقیق و توسعه (R&D)', owner: 'R-CEO', description: 'طراحی محصولات جدید.' },
+            { id: 'BP-29', name: 'خروج و تسویه (Offboarding)', owner: 'R-INT', description: 'تحویل اموال و لغو دسترسی‌ها.' },
+            { id: 'BP-30', name: 'فروش سازمانی (B2B)', owner: 'R-CEO', description: 'قرارداد با مدارس و سازمان‌ها.' },
+            { id: 'BP-31', name: 'سنجش رضایت (NPS)', owner: 'R-MKT', description: 'نظرسنجی دوره‌ای و تحلیل.' },
+            { id: 'BP-32', name: 'انبارگردانی و اموال', owner: 'R-FIN', description: 'کنترل دارایی‌های فیزیکی.' },
+            { id: 'BP-33', name: 'مدیریت دانش', owner: 'R-INT', description: 'مستندسازی رویه‌ها و آموزش‌ها.' },
+            { id: 'BP-34', name: 'آزمون‌های ماک', owner: 'R-EDU', description: 'برگزاری آزمون‌های شبیه‌سازی شده.' },
+            { id: 'BP-35', name: 'باشگاه مشتریان (Alumni)', owner: 'R-MKT', description: 'مدیریت وفاداری و بازگشت مشتری.' },
         ];
 
+        // 4. TASK MATRIX (FULL RECONSTRUCTION)
         const tasksDB = [
-            // --- BP-01 Admission ---
-            { id: 'T1-1', pid: 'BP-01', role: 'R-SAL', type: 'Main', desc: 'پاسخگویی و ثبت لید در CRM', freq: 'روزانه' },
-            { id: 'T1-2', pid: 'BP-01', role: 'R-SAL', type: 'Main', desc: 'مشاوره حضوری و متقاعدسازی', freq: 'روزانه' },
-            { id: 'T1-3', pid: 'BP-01', role: 'R-SUP-H', type: 'Support', desc: 'انجام آزمون تعیین سطح', freq: 'موردی' },
-            { id: 'T1-4', pid: 'BP-01', role: 'R-ADM', type: 'Main', desc: 'دریافت مدارک و تکمیل پرونده', freq: 'روزانه' },
-            { id: 'T1-5', pid: 'BP-01', role: 'R-REC-S', type: 'Control', desc: 'تایید نهایی پرونده و ثبت‌نام', freq: 'روزانه' },
+            // BP-01 Admission
+            { id: 'T1-1', pid: 'BP-01', role: 'R-SAL', type: 'Main', desc: 'پاسخگویی تلفنی و ثبت لید در CRM', freq: 'روزانه' },
+            { id: 'T1-2', pid: 'BP-01', role: 'R-SAL', type: 'Main', desc: 'مشاوره حضوری و متقاعدسازی والدین', freq: 'روزانه' },
+            { id: 'T1-3', pid: 'BP-01', role: 'R-SUP-H', type: 'Support', desc: 'انجام آزمون تعیین سطح شفاهی/کتبی', freq: 'موردی' },
+            { id: 'T1-4', pid: 'BP-01', role: 'R-ADM', type: 'Main', desc: 'دریافت مدارک و تکمیل فیزیکی پرونده', freq: 'روزانه' },
+            { id: 'T1-5', pid: 'BP-01', role: 'R-REC-S', type: 'Control', desc: 'تایید نهایی پرونده و ثبت قطعی در سیستم', freq: 'روزانه' },
 
-            // --- BP-03 Quality Assurance ---
-            { id: 'T3-1', pid: 'BP-03', role: 'R-SUP-H', type: 'Main', desc: 'تدوین جدول زمان‌بندی آبزرو ترمیک', freq: 'ماهانه' },
-            { id: 'T3-2', pid: 'BP-03', role: 'R-SUP-H', type: 'Main', desc: 'حضور در کلاس و تکمیل چک‌لیست استاندارد', freq: 'هفتگی' },
-            { id: 'T3-3', pid: 'BP-03', role: 'R-EDU', type: 'Control', desc: 'بررسی گزارش‌های آبزرو و امتیازدهی', freq: 'هفتگی' },
-            { id: 'T3-4', pid: 'BP-03', role: 'R-SUP-H', type: 'Main', desc: 'جلسه بازخورد (Feedback) خصوصی با معلم', freq: 'هفتگی' },
-            { id: 'T3-5', pid: 'BP-03', role: 'R-EDU', type: 'Main', desc: 'نیازسنجی برای ورکشاپ‌های ضمن خدمت', freq: 'فصلی' },
+            // BP-02 Events
+            { id: 'T2-1', pid: 'BP-02', role: 'R-EVT', type: 'Main', desc: 'ایده‌پردازی سناریو و تم رویداد', freq: 'فصلی' },
+            { id: 'T2-2', pid: 'BP-02', role: 'R-FIN', type: 'Control', desc: 'برآورد و تایید بودجه رویداد', freq: 'موردی' },
+            { id: 'T2-3', pid: 'BP-02', role: 'R-ADM', type: 'Support', desc: 'خرید لوازم دکور و پذیرایی', freq: 'موردی' },
+            { id: 'T2-4', pid: 'BP-02', role: 'R-MKT', type: 'Main', desc: 'طراحی پوستر و تبلیغات رویداد', freq: 'موردی' },
+            { id: 'T2-5', pid: 'BP-02', role: 'R-REC-S', type: 'Support', desc: 'مدیریت اجرایی و نظم‌دهی روز مراسم', freq: 'روز رویداد' },
 
-            // --- BP-04 Petty Cash ---
+            // BP-03 QA
+            { id: 'T3-1', pid: 'BP-03', role: 'R-SUP-H', type: 'Main', desc: 'تدوین جدول زمان‌بندی مشاهده (Observation)', freq: 'ماهانه' },
+            { id: 'T3-2', pid: 'BP-03', role: 'R-SUP-H', type: 'Main', desc: 'حضور در کلاس و تکمیل فرم ارزیابی', freq: 'هفتگی' },
+            { id: 'T3-3', pid: 'BP-03', role: 'R-EDU', type: 'Control', desc: 'تحلیل گزارش‌های ارزیابی و امتیازدهی', freq: 'هفتگی' },
+            { id: 'T3-4', pid: 'BP-03', role: 'R-SUP-H', type: 'Main', desc: 'جلسه بازخورد (Feedback) با مدرس', freq: 'هفتگی' },
+            { id: 'T3-5', pid: 'BP-03', role: 'R-EDU', type: 'Main', desc: 'برنامه‌ریزی کارگاه‌های آموزشی (TTC)', freq: 'فصلی' },
+
+            // BP-04 Petty Cash
             { id: 'T4-1', pid: 'BP-04', role: 'R-ADM', type: 'Main', desc: 'ثبت درخواست خرید کالا/خدمات', freq: 'روزانه' },
-            { id: 'T4-2', pid: 'BP-04', role: 'R-INT', type: 'Control', desc: 'تایید ضرورت خرید و انطباق با بودجه', freq: 'روزانه' },
+            { id: 'T4-2', pid: 'BP-04', role: 'R-INT', type: 'Control', desc: 'تایید ضرورت و انطباق با بودجه', freq: 'روزانه' },
             { id: 'T4-3', pid: 'BP-04', role: 'R-ADM', type: 'Main', desc: 'انجام خرید و دریافت فاکتور معتبر', freq: 'روزانه' },
-            { id: 'T4-4', pid: 'BP-04', role: 'R-ADM', type: 'Main', desc: 'ارائه لاشه فاکتورها به مالی', freq: 'هفتگی' },
-            { id: 'T4-5', pid: 'BP-04', role: 'R-FIN', type: 'Control', desc: 'سندرسی فاکتورها و مغایرت‌گیری', freq: 'هفتگی' },
-            { id: 'T4-6', pid: 'BP-04', role: 'R-FIN', type: 'Main', desc: 'شارژ مجدد حساب تنخواه گردان', freq: 'هفتگی' },
+            { id: 'T4-4', pid: 'BP-04', role: 'R-FIN', type: 'Control', desc: 'سندرسی فاکتورها و تسویه تنخواه', freq: 'هفتگی' },
 
-            // --- BP-05 Complaints ---
-            { id: 'T5-1', pid: 'BP-05', role: 'R-REC-S', type: 'Main', desc: 'دریافت شکایت و ثبت در فرم CRM', freq: 'موردی' },
-            { id: 'T5-2', pid: 'BP-05', role: 'R-REC-S', type: 'Support', desc: 'آرام‌سازی اولیه (De-escalation)', freq: 'موردی' },
-            { id: 'T5-3', pid: 'BP-05', role: 'R-INT', type: 'Main', desc: 'بررسی ریشه‌ای و مصاحبه با افراد درگیر', freq: 'موردی' },
-            { id: 'T5-4', pid: 'BP-05', role: 'R-EDU', type: 'Support', desc: 'کارشناسی فنی (اگر شکایت آموزشی باشد)', freq: 'موردی' },
-            { id: 'T5-5', pid: 'BP-05', role: 'R-INT', type: 'Main', desc: 'تماس با شاکی و اعلام نتیجه نهایی', freq: 'موردی' },
-            { id: 'T5-6', pid: 'BP-05', role: 'R-CEO', type: 'Control', desc: 'پایش آمار شکایات برای اصلاح سیستم', freq: 'ماهانه' },
+            // BP-05 Complaints
+            { id: 'T5-1', pid: 'BP-05', role: 'R-REC-S', type: 'Main', desc: 'ثبت اولیه شکایت و آرام‌سازی (سطح ۱)', freq: 'آنی' },
+            { id: 'T5-2', pid: 'BP-05', role: 'R-INT', type: 'Control', desc: 'ارجاع به واحد تخصصی (مالی/آموزش)', freq: 'آنی' },
+            { id: 'T5-3', pid: 'BP-05', role: 'R-EDU', type: 'Support', desc: 'کارشناسی فنی شکایات آموزشی', freq: 'موردی' },
+            { id: 'T5-4', pid: 'BP-05', role: 'R-INT', type: 'Main', desc: 'تماس با شاکی و جلب رضایت نهایی', freq: 'موردی' },
 
-            // --- BP-08 Class Planning ---
-            { id: 'T8-1', pid: 'BP-08', role: 'R-REC-S', type: 'Support', desc: 'استخراج آمار پیش‌ثبت‌نام و لیست انتظار', freq: 'فصلی' },
-            { id: 'T8-2', pid: 'BP-08', role: 'R-SUP-H', type: 'Main', desc: 'دریافت زمان‌های آزاد معلمین (Availability)', freq: 'فصلی' },
-            { id: 'T8-3', pid: 'BP-08', role: 'R-SUP-H', type: 'Main', desc: 'چیدمان اولیه جدول کلاس‌ها (روز/ساعت)', freq: 'فصلی' },
-            { id: 'T8-4', pid: 'BP-08', role: 'R-EDU', type: 'Control', desc: 'بررسی توازن سطح‌ها و تایید نهایی', freq: 'فصلی' },
-            { id: 'T8-5', pid: 'BP-08', role: 'R-ADM', type: 'Main', desc: 'ورود اطلاعات کلاس‌ها در سیستم (LIMS)', freq: 'فصلی' },
-            { id: 'T8-6', pid: 'BP-08', role: 'R-SAL', type: 'Main', desc: 'انتشار تقویم ترم جدید برای والدین', freq: 'فصلی' },
+            // BP-06 Logistics
+            { id: 'T6-1', pid: 'BP-06', role: 'R-ADM', type: 'Main', desc: 'نظارت بر چک‌لیست نظافت روزانه', freq: 'روزانه' },
+            { id: 'T6-2', pid: 'BP-06', role: 'R-ADM', type: 'Main', desc: 'کنترل موجودی انبار مصرفی', freq: 'هفتگی' },
+            { id: 'T6-3', pid: 'BP-06', role: 'R-INT', type: 'Control', desc: 'بازرسی دوره‌ای سلامت تاسیسات', freq: 'ماهانه' },
 
-            // --- BP-09 Class Merger ---
-            { id: 'T9-1', pid: 'BP-09', role: 'R-ADM', type: 'Main', desc: 'گزارش کلاس‌های زیر حد نصاب (هفته اول)', freq: 'آغاز ترم' },
-            { id: 'T9-2', pid: 'BP-09', role: 'R-EDU', type: 'Control', desc: 'تصمیم‌گیری برای ادغام یا انحلال', freq: 'آغاز ترم' },
-            { id: 'T9-3', pid: 'BP-09', role: 'R-SAL', type: 'Main', desc: 'تماس حساس با والدین و پیشنهاد جایگزین', freq: 'آغاز ترم' },
-            { id: 'T9-4', pid: 'BP-09', role: 'R-ADM', type: 'Main', desc: 'ویرایش سیستم و انتقال دانش‌آموزان', freq: 'آغاز ترم' },
-            { id: 'T9-5', pid: 'BP-09', role: 'R-FIN', type: 'Support', desc: 'محاسبه مابه‌التفاوت شهریه (در صورت تغییر)', freq: 'آغاز ترم' },
+            // BP-07 Payroll
+            { id: 'T7-1', pid: 'BP-07', role: 'R-REC-S', type: 'Main', desc: 'استخراج کارکرد پرسنل اداری', freq: 'ماهانه' },
+            { id: 'T7-2', pid: 'BP-07', role: 'R-EDU', type: 'Main', desc: 'تایید ساعات تدریس مدرسین', freq: 'ماهانه' },
+            { id: 'T7-3', pid: 'BP-07', role: 'R-FIN', type: 'Main', desc: 'محاسبه حقوق، کسر بیمه و مالیات', freq: 'ماهانه' },
+            { id: 'T7-4', pid: 'BP-07', role: 'R-CEO', type: 'Control', desc: 'تایید نهایی لیست پرداخت', freq: 'ماهانه' },
+            { id: 'T7-5', pid: 'BP-07', role: 'R-FIN', type: 'Main', desc: 'واریز حقوق به حساب‌ها', freq: 'ماهانه' },
 
-            // --- BP-10 Advertising ---
-            { id: 'T10-1', pid: 'BP-10', role: 'R-MKT', type: 'Main', desc: 'تدوین استراتژی کمپین (هدف و پیام)', freq: 'فصلی' },
-            { id: 'T10-2', pid: 'BP-10', role: 'R-FIN', type: 'Control', desc: 'بررسی و تصویب بودجه تبلیغاتی', freq: 'فصلی' },
-            { id: 'T10-3', pid: 'BP-10', role: 'R-EVT', type: 'Support', desc: 'تولید محتوای بصری (بنر/تیزر)', freq: 'فصلی' },
-            { id: 'T10-4', pid: 'BP-10', role: 'R-MKT', type: 'Main', desc: 'اجرای تبلیغات (محیطی/دیجیتال)', freq: 'فصلی' },
-            { id: 'T10-5', pid: 'BP-10', role: 'R-SAL', type: 'Main', desc: 'ثبت دقیق ورودی‌ها (Leads) و منبع جذب', freq: 'روزانه' },
-            { id: 'T10-6', pid: 'BP-10', role: 'R-MKT', type: 'Control', desc: 'تحلیل نرخ تبدیل و هزینه جذب (CAC)', freq: 'پایان کمپین' },
+            // BP-08 Class Planning
+            { id: 'T8-1', pid: 'BP-08', role: 'R-REC-S', type: 'Support', desc: 'ارائه آمار پیش‌ثبت‌نام و لیست انتظار', freq: 'فصلی' },
+            { id: 'T8-2', pid: 'BP-08', role: 'R-SUP-H', type: 'Main', desc: 'دریافت برنامه زمانی مدرسین', freq: 'فصلی' },
+            { id: 'T8-3', pid: 'BP-08', role: 'R-SUP-H', type: 'Main', desc: 'چیدمان اولیه جدول کلاس‌ها', freq: 'فصلی' },
+            { id: 'T8-4', pid: 'BP-08', role: 'R-EDU', type: 'Control', desc: 'تصویب نهایی برنامه ترمیک', freq: 'فصلی' },
+            { id: 'T8-5', pid: 'BP-08', role: 'R-ADM', type: 'Main', desc: 'تعریف کلاس‌ها در سیستم LIMS', freq: 'فصلی' },
 
-            // --- BP-11 Social Media ---
+            // BP-09 Class Merger
+            { id: 'T9-1', pid: 'BP-09', role: 'R-ADM', type: 'Main', desc: 'گزارش کلاس‌های زیر حد نصاب', freq: 'شروع ترم' },
+            { id: 'T9-2', pid: 'BP-09', role: 'R-EDU', type: 'Control', desc: 'تصمیم‌گیری برای ادغام یا انحلال', freq: 'شروع ترم' },
+            { id: 'T9-3', pid: 'BP-09', role: 'R-SAL', type: 'Main', desc: 'مذاکره با والدین برای جابجایی', freq: 'شروع ترم' },
+            { id: 'T9-4', pid: 'BP-09', role: 'R-FIN', type: 'Support', desc: 'محاسبه مابه‌التفاوت شهریه', freq: 'شروع ترم' },
+
+            // BP-10 Advertising
+            { id: 'T10-1', pid: 'BP-10', role: 'R-MKT', type: 'Main', desc: 'تدوین استراتژی و پیام کمپین', freq: 'فصلی' },
+            { id: 'T10-2', pid: 'BP-10', role: 'R-FIN', type: 'Control', desc: 'تخصیص بودجه تبلیغات', freq: 'فصلی' },
+            { id: 'T10-3', pid: 'BP-10', role: 'R-MKT', type: 'Main', desc: 'اجرای تبلیغات محیطی و دیجیتال', freq: 'فصلی' },
+            { id: 'T10-4', pid: 'BP-10', role: 'R-SAL', type: 'Main', desc: 'ثبت دقیق ورودی‌ها (Leads)', freq: 'روزانه' },
+            { id: 'T10-5', pid: 'BP-10', role: 'R-MKT', type: 'Control', desc: 'تحلیل نرخ تبدیل (Conversion Rate)', freq: 'پایان کمپین' },
+
+            // BP-11 Social Media
             { id: 'T11-1', pid: 'BP-11', role: 'R-MKT', type: 'Main', desc: 'تدوین تقویم محتوایی ماهانه', freq: 'ماهانه' },
-            { id: 'T11-2', pid: 'BP-11', role: 'R-EVT', type: 'Main', desc: 'هماهنگی و ضبط ویدیو از کلاس‌ها', freq: 'هفتگی' },
-            { id: 'T11-3', pid: 'BP-11', role: 'R-MKT', type: 'Support', desc: 'تدوین و گرافیک پست‌ها', freq: 'هفتگی' },
-            { id: 'T11-4', pid: 'BP-11', role: 'R-SAL', type: 'Main', desc: 'انتشار پست/استوری طبق تقویم', freq: 'روزانه' },
-            { id: 'T11-5', pid: 'BP-11', role: 'R-SAL', type: 'Main', desc: 'پاسخگویی به کامنت و دایرکت (تعامل)', freq: 'روزانه' },
-            { id: 'T11-6', pid: 'BP-11', role: 'R-MKT', type: 'Control', desc: 'تحلیل اینسایت و رشد پیج', freq: 'ماهانه' },
+            { id: 'T11-2', pid: 'BP-11', role: 'R-EVT', type: 'Main', desc: 'تولید محتوا (عکس/فیلم) از کلاس‌ها', freq: 'هفتگی' },
+            { id: 'T11-3', pid: 'BP-11', role: 'R-SAL', type: 'Main', desc: 'انتشار استوری و پست', freq: 'روزانه' },
+            { id: 'T11-4', pid: 'BP-11', role: 'R-SAL', type: 'Main', desc: 'پاسخگویی دایرکت و کامنت', freq: 'روزانه' },
 
-            // Other Processes
-            { id: 'T6', pid: 'BP-07', role: 'R-REC-S', type: 'Main', desc: 'ارسال کارکرد اداری', freq: 'ماهانه' },
-            { id: 'T7', pid: 'BP-07', role: 'R-EDU', type: 'Main', desc: 'ارسال کارکرد معلمین', freq: 'ماهانه' },
-            { id: 'T8', pid: 'BP-07', role: 'R-FIN', type: 'Main', desc: 'محاسبه فیش حقوقی', freq: 'ماهانه' },
-            { id: 'T9', pid: 'BP-07', role: 'R-CEO', type: 'Control', desc: 'تایید لیست پرداخت', freq: 'ماهانه' },
-            { id: 'T10', pid: 'BP-07', role: 'R-FIN', type: 'Main', desc: 'واریز وجه', freq: 'ماهانه' },
+            // BP-12 Leave
+            { id: 'T12-1', pid: 'BP-12', role: 'R-REC-S', type: 'Main', desc: 'ثبت درخواست مرخصی', freq: 'موردی' },
+            { id: 'T12-2', pid: 'BP-12', role: 'R-INT', type: 'Control', desc: 'بررسی جانشین و تایید مرخصی', freq: 'موردی' },
+            { id: 'T12-3', pid: 'BP-12', role: 'R-ADM', type: 'Support', desc: 'ثبت در سیستم حضور و غیاب', freq: 'موردی' },
 
-            { id: 'T11', pid: 'BP-15', role: 'R-EDU', type: 'Main', desc: 'بررسی رزومه', freq: 'موردی' },
-            { id: 'T12', pid: 'BP-15', role: 'R-SUP-H', type: 'Main', desc: 'جلسه دمو (Demo)', freq: 'موردی' },
-            { id: 'T13', pid: 'BP-15', role: 'R-EDU', type: 'Control', desc: 'تایید فنی نهایی', freq: 'موردی' },
-            { id: 'T14', pid: 'BP-15', role: 'R-INT', type: 'Support', desc: 'عقد قرارداد', freq: 'موردی' },
+            // BP-13 Advance Payment
+            { id: 'T13-1', pid: 'BP-13', role: 'R-FIN', type: 'Main', desc: 'بررسی درخواست مساعده و سقف مجاز', freq: 'موردی' },
+            { id: 'T13-2', pid: 'BP-13', role: 'R-CEO', type: 'Control', desc: 'تایید نهایی پرداخت', freq: 'موردی' },
 
-            { id: 'T15', pid: 'BP-17', role: 'R-INT', type: 'Main', desc: 'تشخیص و گزارش بحران', freq: 'آنی' },
-            { id: 'T16', pid: 'BP-17', role: 'R-CEO', type: 'Main', desc: 'تشکیل کمیته اضطرار', freq: 'آنی' },
-            { id: 'T17', pid: 'BP-17', role: 'R-MKT', type: 'Support', desc: 'مدیریت رسانه/شایعات', freq: 'موردی' },
-            { id: 'T18', pid: 'BP-17', role: 'R-CEO', type: 'Control', desc: 'اعلام وضعیت عادی', freq: 'موردی' },
+            // BP-14 Admin Hiring
+            { id: 'T14-1', pid: 'BP-14', role: 'R-INT', type: 'Main', desc: 'انتشار آگهی استخدام اداری', freq: 'موردی' },
+            { id: 'T14-2', pid: 'BP-14', role: 'R-INT', type: 'Main', desc: 'مصاحبه عمومی و رفتاری', freq: 'موردی' },
+            { id: 'T14-3', pid: 'BP-14', role: 'R-CEO', type: 'Control', desc: 'مصاحبه نهایی و گزینش', freq: 'موردی' },
 
-            { id: 'T19', pid: 'BP-02', role: 'R-EVT', type: 'Main', desc: 'طراحی سناریو ایونت', freq: 'فصلی' },
-            { id: 'T20', pid: 'BP-02', role: 'R-FIN', type: 'Control', desc: 'تایید بودجه', freq: 'موردی' },
-            { id: 'T21', pid: 'BP-02', role: 'R-ADM', type: 'Support', desc: 'خرید و تدارکات', freq: 'موردی' },
-            { id: 'T22', pid: 'BP-02', role: 'R-MKT', type: 'Main', desc: 'تبلیغات و دعوت', freq: 'روزانه' },
-            { id: 'T23', pid: 'BP-02', role: 'R-REC-S', type: 'Support', desc: 'اجرا و نظم‌دهی', freq: 'موردی' },
+            // BP-15 Teacher Hiring
+            { id: 'T15-1', pid: 'BP-15', role: 'R-EDU', type: 'Main', desc: 'بررسی رزومه متقاضیان تدریس', freq: 'موردی' },
+            { id: 'T15-2', pid: 'BP-15', role: 'R-SUP-H', type: 'Main', desc: 'برگزاری جلسه دمو (Demo)', freq: 'موردی' },
+            { id: 'T15-3', pid: 'BP-15', role: 'R-EDU', type: 'Control', desc: 'تایید صلاحیت علمی و فنی', freq: 'موردی' },
+            { id: 'T15-4', pid: 'BP-15', role: 'R-INT', type: 'Support', desc: 'عقد قرارداد همکاری', freq: 'موردی' },
 
-            { id: 'T24', pid: 'BP-12', role: 'R-REC-S', type: 'Main', desc: 'درخواست اولیه مرخصی', freq: 'موردی' },
-            { id: 'T25', pid: 'BP-12', role: 'R-INT', type: 'Control', desc: 'بررسی جانشین و تایید', freq: 'موردی' },
-            { id: 'T26', pid: 'BP-12', role: 'R-ADM', type: 'Support', desc: 'ثبت در سیستم حضور غیاب', freq: 'موردی' },
+            // BP-16 Disciplinary
+            { id: 'T16-1', pid: 'BP-16', role: 'R-SUP-H', type: 'Main', desc: 'گزارش کتبی تخلف پرسنل/معلم', freq: 'موردی' },
+            { id: 'T16-2', pid: 'BP-16', role: 'R-INT', type: 'Control', desc: 'بررسی مستندات و تذکر اولیه', freq: 'موردی' },
+            { id: 'T16-3', pid: 'BP-16', role: 'R-CEO', type: 'Control', desc: 'صدور حکم کمیته انضباطی', freq: 'موردی' },
+            { id: 'T16-4', pid: 'BP-16', role: 'R-ADM', type: 'Support', desc: 'درج در پرونده پرسنلی', freq: 'موردی' },
 
-            { id: 'T34', pid: 'BP-06', role: 'R-ADM', type: 'Main', desc: 'چک‌لیست نظافت', freq: 'روزانه' },
-            { id: 'T35', pid: 'BP-06', role: 'R-INT', type: 'Control', desc: 'بازرسی محیطی', freq: 'هفتگی' },
+            // BP-17 Crisis
+            { id: 'T17-1', pid: 'BP-17', role: 'R-INT', type: 'Main', desc: 'شناسایی و گزارش وضعیت بحرانی', freq: 'آنی' },
+            { id: 'T17-2', pid: 'BP-17', role: 'R-CEO', type: 'Main', desc: 'تشکیل جلسه کمیته اضطرار', freq: 'آنی' },
+            { id: 'T17-3', pid: 'BP-17', role: 'R-MKT', type: 'Support', desc: 'مدیریت شایعات و فضای رسانه‌ای', freq: 'آنی' },
 
-            { id: 'T44', pid: 'BP-13', role: 'R-FIN', type: 'Main', desc: 'بررسی درخواست مساعده', freq: 'موردی' },
-            { id: 'T45', pid: 'BP-13', role: 'R-CEO', type: 'Control', desc: 'تایید نهایی', freq: 'موردی' },
+            // BP-18 Incident
+            { id: 'T18-1', pid: 'BP-18', role: 'R-REC-S', type: 'Main', desc: 'تخلیه اضطراری و تماس با امداد', freq: 'آنی' },
+            { id: 'T18-2', pid: 'BP-18', role: 'R-INT', type: 'Control', desc: 'مدیریت صحنه حادثه و ایمن‌سازی', freq: 'آنی' },
 
-            { id: 'T46', pid: 'BP-14', role: 'R-INT', type: 'Main', desc: 'مصاحبه اداری', freq: 'موردی' },
-            { id: 'T47', pid: 'BP-14', role: 'R-CEO', type: 'Control', desc: 'تایید استخدام', freq: 'موردی' },
+            // BP-19 Policy
+            { id: 'T19-1', pid: 'BP-19', role: 'R-CEO', type: 'Main', desc: 'تدوین استراتژی و اهداف سالانه', freq: 'سالانه' },
+            { id: 'T19-2', pid: 'BP-19', role: 'R-FIN', type: 'Support', desc: 'بودجه‌بندی کلان سازمان', freq: 'سالانه' },
 
-            { id: 'T48', pid: 'BP-16', role: 'R-SUP-H', type: 'Main', desc: 'گزارش تخلف/تشویق', freq: 'موردی' },
-            { id: 'T49', pid: 'BP-16', role: 'R-CEO', type: 'Control', desc: 'صدور حکم انضباطی', freq: 'موردی' },
+            // BP-20 Clips
+            { id: 'T20-1', pid: 'BP-20', role: 'R-EDU', type: 'Main', desc: 'تعیین موضوع و سناریو کلیپ', freq: 'هفتگی' },
+            { id: 'T20-2', pid: 'BP-20', role: 'R-EVT', type: 'Main', desc: 'فیلمبرداری و نورپردازی', freq: 'هفتگی' },
+            { id: 'T20-3', pid: 'BP-20', role: 'R-MKT', type: 'Main', desc: 'تدوین حرفه‌ای و گرافیک', freq: 'هفتگی' },
+            { id: 'T20-4', pid: 'BP-20', role: 'R-SAL', type: 'Main', desc: 'انتشار و کپشن‌نویسی', freq: 'هفتگی' },
 
-            { id: 'T50', pid: 'BP-18', role: 'R-REC-S', type: 'Main', desc: 'تخلیه اضطراری', freq: 'آنی' },
-            { id: 'T51', pid: 'BP-18', role: 'R-INT', type: 'Control', desc: 'مدیریت حادثه', freq: 'آنی' },
+            // BP-21 Archive
+            { id: 'T21-1', pid: 'BP-21', role: 'R-ADM', type: 'Main', desc: 'مرتب‌سازی و لیبل‌زنی زونکن‌ها', freq: 'هفتگی' },
+            { id: 'T21-2', pid: 'BP-21', role: 'R-ADM', type: 'Main', desc: 'اسکن و بایگانی دیجیتال مدارک', freq: 'روزانه' },
 
-            { id: 'T52', pid: 'BP-19', role: 'R-CEO', type: 'Main', desc: 'تدوین استراتژی سالانه', freq: 'سالانه' },
-            { id: 'T53', pid: 'BP-19', role: 'R-MKT', type: 'Support', desc: 'تحلیل بازار', freq: 'سالانه' },
+            // BP-22 System
+            { id: 'T22-1', pid: 'BP-22', role: 'R-ADM', type: 'Main', desc: 'تعریف ترم و کلاس در سیستم LIMS', freq: 'فصلی' },
+            { id: 'T22-2', pid: 'BP-22', role: 'R-INT', type: 'Control', desc: 'نظارت بر عملکرد سرور و شبکه', freq: 'هفتگی' },
 
-            { id: 'T20-1', pid: 'BP-20', role: 'R-EDU', type: 'Main', desc: 'تعیین موضوع و نوشتن سناریو', freq: 'هفتگی' },
-            { id: 'T20-2', pid: 'BP-20', role: 'R-EVT', type: 'Main', desc: 'ضبط ویدیو با تجهیزات', freq: 'هفتگی' },
-            { id: 'T20-3', pid: 'BP-20', role: 'R-MKT', type: 'Support', desc: 'تدوین و افکت‌گذاری (تیم مدیا)', freq: 'هفتگی' },
-            { id: 'T20-4', pid: 'BP-20', role: 'R-EDU', type: 'Control', desc: 'بازبینی علمی محتوا', freq: 'هفتگی' },
-            { id: 'T20-5', pid: 'BP-20', role: 'R-SAL', type: 'Main', desc: 'انتشار در کانال‌ها و اینستاگرام', freq: 'هفتگی' },
+            // BP-23 Groups
+            { id: 'T23-1', pid: 'BP-23', role: 'R-ADM', type: 'Main', desc: 'ساخت گروه‌های کلاسی واتس‌اپ', freq: 'شروع ترم' },
+            { id: 'T23-2', pid: 'BP-23', role: 'R-REC-S', type: 'Main', desc: 'ارسال اطلاعیه‌ها و تکالیف', freq: 'روزانه' },
 
-            { id: 'T21-1', pid: 'BP-21', role: 'R-ADM', type: 'Main', desc: 'مرتب‌سازی فیزیکی زونکن‌ها', freq: 'هفتگی' },
-            { id: 'T21-2', pid: 'BP-21', role: 'R-ADM', type: 'Main', desc: 'اسکن مدارک و بایگانی دیجیتال', freq: 'روزانه' },
-            { id: 'T21-3', pid: 'BP-21', role: 'R-REC-S', type: 'Control', desc: 'چک کردن کسری مدارک پرونده‌ها', freq: 'ماهانه' },
-
-            { id: 'T22-1', pid: 'BP-22', role: 'R-ADM', type: 'Main', desc: 'تعریف کلاس‌ها و معلمین در LIMS (تشکیل)', freq: 'فصلی' },
-            { id: 'T22-2', pid: 'BP-22', role: 'R-ADM', type: 'Main', desc: 'ویرایش مشخصات زبان‌آموزان (ادیت)', freq: 'روزانه' },
-            { id: 'T22-3', pid: 'BP-22', role: 'R-INT', type: 'Control', desc: 'نظارت بر سرویس اینترنت و سرورها', freq: 'هفتگی' },
-            { id: 'T22-4', pid: 'BP-22', role: 'R-INT', type: 'Main', desc: 'هماهنگی تعمیرات سخت‌افزاری (کولر/PC)', freq: 'موردی' },
-
-            { id: 'T23-1', pid: 'BP-23', role: 'R-ADM', type: 'Main', desc: 'ساخت گروه‌های واتس‌اپ/تلگرام کلاسی', freq: 'فصلی' },
-            { id: 'T23-2', pid: 'BP-23', role: 'R-EDU', type: 'Support', desc: 'تولید محتوای آموزشی برای ارسال', freq: 'هفتگی' },
-            { id: 'T23-3', pid: 'BP-23', role: 'R-REC-S', type: 'Main', desc: 'ارسال اطلاعیه‌ها و مطالب در گروه‌ها', freq: 'روزانه' },
-            { id: 'T23-4', pid: 'BP-23', role: 'R-REC-S', type: 'Control', desc: 'پایش چت‌ها و پاسخگویی', freq: 'روزانه' },
-
+            // BP-24 Report Cards
             { id: 'T24-1', pid: 'BP-24', role: 'R-SUP-H', type: 'Main', desc: 'پیگیری ثبت نمرات توسط معلمین', freq: 'پایان ترم' },
-            { id: 'T24-2', pid: 'BP-24', role: 'R-EDU', type: 'Control', desc: 'بررسی نمودار نمرات و تایید نهایی', freq: 'پایان ترم' },
-            { id: 'T24-3', pid: 'BP-24', role: 'R-ADM', type: 'Support', desc: 'چاپ کارنامه‌ها و آماده‌سازی فیزیکی', freq: 'پایان ترم' },
-            { id: 'T24-4', pid: 'BP-24', role: 'R-SAL', type: 'Main', desc: 'ارسال فایل دیجیتال یا تحویل حضوری', freq: 'پایان ترم' },
+            { id: 'T24-2', pid: 'BP-24', role: 'R-EDU', type: 'Control', desc: 'کنترل کیفیت نمرات و کامنت‌ها', freq: 'پایان ترم' },
+            { id: 'T24-3', pid: 'BP-24', role: 'R-ADM', type: 'Support', desc: 'چاپ و آماده‌سازی کارنامه‌ها', freq: 'پایان ترم' },
+            { id: 'T24-4', pid: 'BP-24', role: 'R-SAL', type: 'Main', desc: 'تحویل کارنامه و ثبت‌نام ترم بعد', freq: 'پایان ترم' },
 
-            { id: 'T25-1', pid: 'BP-25', role: 'R-SUP-O', type: 'Main', desc: 'چک کردن لاگین معلم و شاگرد قبل کلاس', freq: 'روزانه' },
-            { id: 'T25-2', pid: 'BP-25', role: 'R-SUP-O', type: 'Main', desc: 'رفع مشکل صدا/تصویر حین کلاس', freq: 'آنی' },
-            { id: 'T25-3', pid: 'BP-25', role: 'R-ADM', type: 'Support', desc: 'ارسال نام کاربری/رمز عبور به والدین', freq: 'موردی' },
+            // BP-25 Online Support
+            { id: 'T25-1', pid: 'BP-25', role: 'R-SUP-O', type: 'Main', desc: 'مانیتورینگ آنلاین کلاس‌ها', freq: 'روزانه' },
+            { id: 'T25-2', pid: 'BP-25', role: 'R-SUP-O', type: 'Main', desc: 'رفع اشکال فنی اتصال کاربران', freq: 'آنی' },
 
-            { id: 'T26-1', pid: 'BP-26', role: 'R-REC-S', type: 'Main', desc: 'تماس با غایبین کلاس‌ها', freq: 'روزانه' },
-            { id: 'T26-2', pid: 'BP-26', role: 'R-REC-S', type: 'Main', desc: 'پیگیری تلفنی انجام تکالیف (Follow-up)', freq: 'هفتگی' },
-            { id: 'T26-3', pid: 'BP-26', role: 'R-SAL', type: 'Support', desc: 'تماس نظرسنجی (Happy Call)', freq: 'ماهانه' },
+            // BP-26 Offline Support
+            { id: 'T26-1', pid: 'BP-26', role: 'R-REC-S', type: 'Main', desc: 'تماس پیگیری غیبت (Absenteeism)', freq: 'روزانه' },
+            { id: 'T26-2', pid: 'BP-26', role: 'R-SAL', type: 'Main', desc: 'تماس سنجش رضایت (Happy Call)', freq: 'ماهانه' },
 
-            { id: 'T27-1', pid: 'BP-27', role: 'R-ADM', type: 'Main', desc: 'دریافت فایل ورک‌شیت و تکثیر (کپی)', freq: 'روزانه' },
-            { id: 'T27-2', pid: 'BP-27', role: 'R-ADM', type: 'Main', desc: 'شارژ ماژیک و تمیز کردن تخته‌ها', freq: 'روزانه' },
-            { id: 'T27-3', pid: 'BP-27', role: 'R-SUP-H', type: 'Control', desc: 'بررسی کیفیت اقلام کمک آموزشی', freq: 'هفتگی' },
+            // BP-27 Teacher Support
+            { id: 'T27-1', pid: 'BP-27', role: 'R-ADM', type: 'Main', desc: 'تکثیر (کپی) ورک‌شیت‌ها', freq: 'روزانه' },
+            { id: 'T27-2', pid: 'BP-27', role: 'R-ADM', type: 'Main', desc: 'تجهیز کلاس (ماژیک، تخته پاک‌کن)', freq: 'روزانه' },
 
-            // --- BP-28 R&D (تحقیق و توسعه) - ADDED ---
-            { id: 'T28-1', pid: 'BP-28', role: 'R-MKT', type: 'Main', desc: 'ایده‌پردازی و پیشنهاد کورس‌های جدید', freq: 'فصلی' },
-            { id: 'T28-2', pid: 'BP-28', role: 'R-FIN', type: 'Main', desc: 'امکان‌سنجی مالی و مدل‌سازی سودآوری پروژه', freq: 'موردی' },
-            { id: 'T28-3', pid: 'BP-28', role: 'R-EDU', type: 'Support', desc: 'بررسی تطابق ایده با استانداردهای آموزشی', freq: 'موردی' },
-            { id: 'T28-4', pid: 'BP-28', role: 'R-INT', type: 'Support', desc: 'بررسی زیرساخت اجرایی و عملیاتی', freq: 'موردی' },
-            { id: 'T28-5', pid: 'BP-28', role: 'R-CEO', type: 'Control', desc: 'تصویب نهایی طرح و دستور اجرا (Pilot)', freq: 'موردی' },
+            // BP-28 R&D
+            { id: 'T28-1', pid: 'BP-28', role: 'R-MKT', type: 'Main', desc: 'پیشنهاد ایده‌های آموزشی جدید', freq: 'فصلی' },
+            { id: 'T28-2', pid: 'BP-28', role: 'R-FIN', type: 'Support', desc: 'امکان‌سنجی مالی طرح‌های نو', freq: 'موردی' },
+            { id: 'T28-3', pid: 'BP-28', role: 'R-CEO', type: 'Control', desc: 'تصویب و ابلاغ طرح‌های توسعه‌ای', freq: 'موردی' },
+
+            // BP-29 Offboarding
+            { id: 'T29-1', pid: 'BP-29', role: 'R-INT', type: 'Main', desc: 'ثبت استعفا و شروع فرآیند خروج', freq: 'موردی' },
+            { id: 'T29-2', pid: 'BP-29', role: 'R-ADM', type: 'Support', desc: 'بازپس‌گیری اموال (کلید، لپ‌تاپ)', freq: 'موردی' },
+            { id: 'T29-3', pid: 'BP-29', role: 'R-FIN', type: 'Control', desc: 'تسویه حساب مالی نهایی', freq: 'موردی' },
+
+            // BP-30 B2B
+            { id: 'T30-1', pid: 'BP-30', role: 'R-MKT', type: 'Main', desc: 'شناسایی مدارس و سازمان‌های هدف', freq: 'فصلی' },
+            { id: 'T30-2', pid: 'BP-30', role: 'R-CEO', type: 'Main', desc: 'مذاکره و عقد قرارداد سازمانی', freq: 'موردی' },
+
+            // BP-31 NPS
+            { id: 'T31-1', pid: 'BP-31', role: 'R-ADM', type: 'Main', desc: 'ارسال فرم نظرسنجی دیجیتال', freq: 'میان‌ترم' },
+            { id: 'T31-2', pid: 'BP-31', role: 'R-MKT', type: 'Control', desc: 'تحلیل داده‌ها و شناسایی نارضایتی', freq: 'فصلی' },
+
+            // BP-32 Asset Audit
+            { id: 'T32-1', pid: 'BP-32', role: 'R-ADM', type: 'Main', desc: 'لیست‌برداری و برچسب‌گذاری اموال', freq: 'سالانه' },
+            { id: 'T32-2', pid: 'BP-32', role: 'R-FIN', type: 'Control', desc: 'شمارش و مغایرت‌گیری دارایی‌ها', freq: 'سالانه' },
+
+            // BP-33 Knowledge
+            { id: 'T33-1', pid: 'BP-33', role: 'R-ADM', type: 'Main', desc: 'تدوین راهنمای مکتوب فرآیندها', freq: 'موردی' },
+            { id: 'T33-2', pid: 'BP-33', role: 'R-INT', type: 'Control', desc: 'بروزرسانی مخزن دانش سازمانی', freq: 'سالانه' },
+
+            // BP-34 Mock Exams
+            { id: 'T34-1', pid: 'BP-34', role: 'R-EDU', type: 'Main', desc: 'برنامه‌ریزی آزمون‌های ماک', freq: 'ماهانه' },
+            { id: 'T34-2', pid: 'BP-34', role: 'R-SUP-H', type: 'Support', desc: 'برگزاری استاندارد آزمون', freq: 'روز آزمون' },
+
+            // BP-35 Alumni
+            { id: 'T35-1', pid: 'BP-35', role: 'R-ADM', type: 'Main', desc: 'آپدیت دیتابیس فارغ‌التحصیلان', freq: 'پایان ترم' },
+            { id: 'T35-2', pid: 'BP-35', role: 'R-MKT', type: 'Main', desc: 'ارسال آفر بازگشت به تحصیل', freq: 'فصلی' },
         ];
 
         function EnglishLandBPM() {
@@ -405,7 +365,7 @@
                                 سیستم مدیریت فرآیند <span className="text-yellow-600">EnglishLand</span>
                             </h1>
                             <p className="text-sm text-slate-500 mt-2 font-bold">
-                                پوشش جامع ۲۸ فرآیند کلیدی (نسخه ERP)
+                                نسخه ۷.۰ (جامع) | پوشش ۳۵ فرآیند با جزئیات کامل
                             </p>
                         </div>
                         <div className="flex bg-slate-100 p-1 rounded-xl overflow-x-auto max-w-full">
