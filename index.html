@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سیستم جامع مدیریت EnglishLand (نسخه نهایی)</title>
+    <title>سیستم جامع مدیریت EnglishLand (نسخه ۱۵.۰)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -19,20 +19,6 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        .tree { white-space: nowrap; overflow-x: auto; min-width: 800px; padding-bottom: 50px; display: flex; justify-content: center; }
-        .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; }
-        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 5px 0 5px; }
-        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #cbd5e1; width: 50%; height: 20px; }
-        .tree li::after { right: auto; left: 50%; border-left: 2px solid #cbd5e1; }
-        .tree li:only-child::after, .tree li:only-child::before { display: none; }
-        .tree li:only-child { padding-top: 0; }
-        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
-        .tree li:last-child::before { border-right: 2px solid #cbd5e1; border-radius: 0 5px 0 0; }
-        .tree li:first-child::after { border-radius: 5px 0 0 0; }
-        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #cbd5e1; width: 0; height: 20px; }
-        .tree-card { background: white; border: 1px solid #e2e8f0; padding: 10px; border-radius: 12px; display: inline-block; min-width: 140px; text-decoration: none; color: #334155; font-size: 0.8rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: all 0.2s; position: relative; z-index: 10; }
-        .tree-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: #6366f1; z-index: 20; }
-
         @media print {
             .no-print { display: none !important; }
             body { background-color: white; }
@@ -49,31 +35,33 @@
     <script type="text/babel">
         const { useState, useMemo } = React;
 
-        // 1. ROLES DATABASE (Consolidated)
+        // 1. ROLES DATABASE (UPDATED)
         const rolesDB = [
-            { id: 'R-CEO', title: 'مدیر عامل', dept: 'Top', parent: null, holder: 'P-01', color: 'bg-amber-50 border-amber-300 text-amber-900', desc: 'رهبر استراتژیک و تصمیم‌گیرنده نهایی.' },
+            // Top Management
+            { id: 'R-CEO', title: 'مدیر عامل & هد آموزش', dept: 'Top', parent: null, holder: 'P-01', color: 'bg-amber-50 border-amber-300 text-amber-900', desc: 'رهبری استراتژیک و تصمیم‌گیرنده نهایی.' },
             
             // Admin & HR
             { id: 'R-INT', title: 'مدیر داخلی & HR', dept: 'Admin', parent: 'R-CEO', holder: 'P-02', color: 'bg-indigo-50 border-indigo-300 text-indigo-900', desc: 'مدیریت منابع انسانی و عملیات داخلی.' },
-            { id: 'R-REC-S', title: 'سرپرست پذیرش', dept: 'Admin', parent: 'R-INT', holder: 'P-08', color: 'bg-white border-slate-200', desc: 'مدیریت میز پذیرش و مراجعین.' },
+            { id: 'R-REC-S', title: 'سرپرست پذیرش', dept: 'Admin', parent: 'R-INT', holder: 'P-08', color: 'bg-white border-slate-200', desc: 'مدیریت میز پذیرش.' },
             { id: 'R-ADM', title: 'مسئول اداری', dept: 'Admin', parent: 'R-INT', holder: 'P-09', color: 'bg-white border-slate-200', desc: 'پشتیبانی لجستیک و بایگانی.' },
             
             // Finance
-            { id: 'R-FIN', title: 'مدیر مالی', dept: 'Finance', parent: 'R-CEO', holder: 'P-03', color: 'bg-emerald-50 border-emerald-300 text-emerald-900', desc: 'مدیریت جریان مالی و حسابداری.' },
+            { id: 'R-FIN', title: 'مدیر مالی', dept: 'Finance', parent: 'R-CEO', holder: 'P-03', color: 'bg-emerald-50 border-emerald-300 text-emerald-900', desc: 'مدیریت جریان مالی.' },
             
             // Marketing
-            { id: 'R-MKT', title: 'مدیر مارکتینگ', dept: 'Marketing', parent: 'R-CEO', holder: 'P-04', color: 'bg-pink-50 border-pink-300 text-pink-900', desc: 'استراتژی برند و جذب لید.' },
-            { id: 'R-EVT-M', title: 'مدیر ایونت', dept: 'Marketing', parent: 'R-MKT', holder: 'P-13', color: 'bg-white border-slate-200', desc: 'مدیریت و اجرای رویدادها.' },
-            { id: 'R-EVT-O', title: 'مسئول اجرایی', dept: 'Marketing', parent: 'R-EVT-M', holder: 'P-11', color: 'bg-slate-50 border-dashed border-slate-300 text-slate-500', desc: 'تدارکات اجرایی رویداد.' },
+            { id: 'R-MKT', title: 'مدیر مارکتینگ', dept: 'Marketing', parent: 'R-CEO', holder: 'P-04', color: 'bg-pink-50 border-pink-300 text-pink-900', desc: 'استراتژی برند.' },
+            { id: 'R-EVT-M', title: 'مدیر ایونت & دستیار مارکتینگ', dept: 'Marketing', parent: 'R-MKT', holder: 'P-13', color: 'bg-white border-slate-200', desc: 'مدیریت رویداد و دستیار اجرایی مارکت.' },
+            { id: 'R-EVT-O', title: 'مسئول اجرایی ایونت', dept: 'Marketing', parent: 'R-EVT-M', holder: 'P-VACANT', color: 'bg-slate-50 border-dashed border-slate-300 text-slate-500', desc: 'تدارکات اجرایی (خالی).' },
             { id: 'R-SAL-I', title: 'فروش حضوری', dept: 'Marketing', parent: 'R-MKT', holder: 'P-10', color: 'bg-white border-slate-200', desc: 'مشاوره ثبت‌نام حضوری.' },
             { id: 'R-SAL-P', title: 'فروش تلفنی', dept: 'Marketing', parent: 'R-MKT', holder: 'P-12', color: 'bg-white border-slate-200', desc: 'پیگیری تلفنی لیدها.' },
+            { id: 'R-SOC', title: 'ادمین سوشال', dept: 'Marketing', parent: 'R-MKT', holder: 'P-14', color: 'bg-white border-slate-200', desc: 'مدیریت پیج و تعاملات.' },
 
             // Education
-            { id: 'R-EDU', title: 'سوپروایزر آموزشی', dept: 'Education', parent: 'R-CEO', holder: 'P-05', color: 'bg-red-50 border-red-300 text-red-900', desc: 'تضمین کیفیت و مدیریت آموزشی.' },
+            { id: 'R-EDU', title: 'سوپروایزر آموزشی', dept: 'Education', parent: 'R-CEO', holder: 'P-05', color: 'bg-red-50 border-red-300 text-red-900', desc: 'مدیریت آموزشی.' },
             { id: 'R-EXP-H', title: 'کارشناس آموزش (H)', dept: 'Education', parent: 'R-EDU', holder: 'P-06', color: 'bg-white border-slate-200', desc: 'نظارت شعبه حضوری.' },
             { id: 'R-EXP-O', title: 'کارشناس آموزش (O)', dept: 'Education', parent: 'R-EDU', holder: 'P-07', color: 'bg-white border-slate-200', desc: 'نظارت شعبه آنلاین.' },
             
-            // Leaf Nodes for Chart
+            // Others
             { id: 'R-TCH-H', title: 'مدرسین حضوری', dept: 'Education', parent: 'R-EXP-H', holder: 'P-TCH', color: 'bg-slate-50 border-dashed border-slate-300 text-slate-500', desc: 'تدریس.' },
             { id: 'R-TCH-O', title: 'مدرسین آنلاین', dept: 'Education', parent: 'R-EXP-O', holder: 'P-TCH', color: 'bg-slate-50 border-dashed border-slate-300 text-slate-500', desc: 'تدریس.' },
             { id: 'R-SRV', title: 'نیروی خدمات', dept: 'Admin', parent: 'R-ADM', holder: 'P-SRV', color: 'bg-slate-50 border-dashed border-slate-300 text-slate-500', desc: 'نظافت.' },
@@ -90,178 +78,179 @@
             { code: 'P-07', name: 'میس مرجان' },
             { code: 'P-08', name: 'میس رها' },
             { code: 'P-09', name: 'میس زهرا' },
-            { code: 'P-10', name: 'میس شیرین' },
-            { code: 'P-11', name: 'میس پرنیان' },
+            { code: 'P-10', name: 'میس شیرین (پذیرش)' },
+            { code: 'P-VACANT', name: 'خالی (جایگزین شود)' },
             { code: 'P-12', name: 'میس ساقی' },
             { code: 'P-13', name: 'میس آتوسا' },
+            { code: 'P-14', name: 'شیرین جوادی' },
             { code: 'P-TCH', name: 'تیم اساتید' },
             { code: 'P-SRV', name: 'پرسنل خدمات' },
         ];
 
-        // 3. PROCESS DEFINITIONS (Added KPIs)
+        // 3. PROCESS DEFINITIONS
         const processesDB = [
-            { id: 'BP-01', name: 'جذب و ثبت‌نام', owner: 'R-MKT', description: 'مسیر تبدیل تماس تلفنی به دانش‌آموز.', kpi: 'نرخ تبدیل ۳۰٪' },
-            { id: 'BP-02', name: 'برگزاری رویداد', owner: 'R-EVT-M', description: 'طراحی و اجرای ایونت‌های مناسبتی.', kpi: 'رضایت > ۹۰٪' },
-            { id: 'BP-03', name: 'تضمین کیفیت آموزش', owner: 'R-EDU', description: 'آبزرو کلاس‌ها و فیدبک به معلم.', kpi: 'پوشش ۱۰۰٪ اساتید' },
-            { id: 'BP-04', name: 'مدیریت تنخواه', owner: 'R-FIN', description: 'مدیریت هزینه‌های جاری.', kpi: 'عدم مغایرت مالی' },
-            { id: 'BP-05', name: 'مدیریت شکایات', owner: 'R-INT', description: 'رسیدگی به اعتراضات والدین.', kpi: 'حل در ۴۸ ساعت' },
-            { id: 'BP-06', name: 'تدارکات و نظافت', owner: 'R-INT', description: 'نظافت محیط و تامین ملزومات.', kpi: 'نمره بهداشت A' },
-            { id: 'BP-07', name: 'حقوق و دستمزد', owner: 'R-FIN', description: 'محاسبه و پرداخت حقوق.', kpi: 'پرداخت تا ۵م ماه' },
-            { id: 'BP-08', name: 'برنامه‌ریزی کلاس', owner: 'R-EDU', description: 'نیازسنجی و زمان‌بندی ترم جدید.', kpi: 'تکمیل ظرفیت ۸۰٪' },
-            { id: 'BP-09', name: 'ادغام کلاس‌ها', owner: 'R-EDU', description: 'مدیریت کلاس‌های زیر حد نصاب.', kpi: 'حفظ ۹۰٪ شاگردان' },
-            { id: 'BP-10', name: 'تبلیغات', owner: 'R-MKT', description: 'استراتژی، بودجه و اجرا.', kpi: 'هزینه جذب (CAC) بهینه' },
-            { id: 'BP-11', name: 'سوشال مدیا', owner: 'R-MKT', description: 'تقویم محتوایی و انتشار.', kpi: 'رشد ۱۰٪ فالوور' },
-            { id: 'BP-12', name: 'درخواست مرخصی', owner: 'R-INT', description: 'مدیریت شیفت.', kpi: 'پوشش ۱۰۰٪ کلاس‌ها' },
-            { id: 'BP-13', name: 'درخواست مساعده', owner: 'R-FIN', description: 'مدیریت وام پرسنلی.', kpi: 'رعایت سقف بودجه' },
-            { id: 'BP-14', name: 'استخدام اداری', owner: 'R-INT', description: 'جذب نیروهای ستادی.', kpi: 'جذب نیروی کیفی' },
-            { id: 'BP-15', name: 'استخدام معلم', owner: 'R-CEO', description: 'جذب کادر آموزشی.', kpi: 'استاندارد تدریس A' },
-            { id: 'BP-16', name: 'فرآیند انضباطی', owner: 'R-INT', description: 'رسیدگی به تخلفات.', kpi: 'کاهش تکرار تخلف' },
-            { id: 'BP-17', name: 'مدیریت بحران', owner: 'R-CEO', description: 'مدیریت شرایط اضطراری.', kpi: 'واکنش سریع' },
-            { id: 'BP-18', name: 'حوادث آنی', owner: 'R-INT', description: 'واکنش سریع به حوادث.', kpi: 'ایمنی ۱۰۰٪' },
-            { id: 'BP-19', name: 'سیاست‌گذاری کلان', owner: 'R-CEO', description: 'تعیین اهداف سالانه.', kpi: 'تحقق اهداف سالانه' },
-            { id: 'BP-20', name: 'تولید کلیپ آموزشی', owner: 'R-EDU', description: 'تولید محتوا برای سوشال.', kpi: '۴ کلیپ در ماه' },
-            { id: 'BP-21', name: 'بایگانی اسناد', owner: 'R-INT', description: 'بایگانی فیزیکی و دیجیتال.', kpi: 'دسترسی سریع' },
-            { id: 'BP-22', name: 'زیرساخت و سیستم', owner: 'R-INT', description: 'آپدیت LIMS و شبکه.', kpi: 'پایداری ۹۹٪' },
-            { id: 'BP-23', name: 'مدیریت گروه‌های خانواده', owner: 'R-INT', description: 'ارسال محتوا در گروه‌ها.', kpi: 'رضایت والدین' },
-            { id: 'BP-24', name: 'صدور کارنامه', owner: 'R-EDU', description: 'نمره‌دهی و تحویل.', kpi: 'تحویل به موقع' },
-            { id: 'BP-25', name: 'پشتیبانی آنلاین', owner: 'R-EDU', description: 'رفع مشکلات فنی.', kpi: 'پاسخگویی زیر ۱۰ دقیقه' },
-            { id: 'BP-26', name: 'پشتیبانی آفلاین', owner: 'R-REC-S', description: 'پیگیری تلفنی.', kpi: 'پیگیری ۱۰۰٪ غایبین' },
-            { id: 'BP-27', name: 'پشتیبانی معلمین', owner: 'R-INT', description: 'تکثیر ورک‌شیت و تجهیزات.', kpi: 'آمادگی کلاس' },
-            { id: 'BP-28', name: 'تحقیق و توسعه (R&D)', owner: 'R-CEO', description: 'طراحی محصولات جدید.', kpi: 'ارائه ۲ طرح در سال' },
-            { id: 'BP-29', name: 'خروج و تسویه', owner: 'R-INT', description: 'تسویه حساب پرسنل.', kpi: 'امنیت اطلاعات' },
-            { id: 'BP-30', name: 'فروش سازمانی', owner: 'R-CEO', description: 'B2B Sales.', kpi: 'عقد قرارداد جدید' },
-            { id: 'BP-31', name: 'سنجش رضایت', owner: 'R-MKT', description: 'NPS.', kpi: 'NPS > 50' },
-            { id: 'BP-32', name: 'انبارگردانی', owner: 'R-FIN', description: 'کنترل اموال.', kpi: 'دقت موجودی ۱۰۰٪' },
-            { id: 'BP-33', name: 'مدیریت دانش', owner: 'R-INT', description: 'مستندسازی.', kpi: 'مستندسازی فرآیندها' },
-            { id: 'BP-34', name: 'آزمون‌های ماک', owner: 'R-EDU', description: 'برگزاری آزمون.', kpi: 'برگزاری استاندارد' },
-            { id: 'BP-35', name: 'باشگاه مشتریان', owner: 'R-MKT', description: 'Alumni.', kpi: 'نرخ بازگشت ۱۵٪' },
-            { id: 'BP-36', name: 'آبزرو زبان‌آموزان', owner: 'R-EDU', description: 'ارزیابی نیازهای تکمیلی.', kpi: 'شناسایی نیازها' },
-            { id: 'BP-37', name: 'آموزش اساتید (TTC)', owner: 'R-EDU', description: 'ارتقای علمی معلمین.', kpi: 'ارتقای نمرات' },
-            { id: 'BP-38', name: 'طراحی کورس', owner: 'R-CEO', description: 'روند آموزشی و کتاب‌ها.', kpi: 'رضایت تحصیلی' },
-            { id: 'BP-39', name: 'کمپین فصلی', owner: 'R-MKT', description: 'استراتژی کلی بازاریابی.', kpi: 'تحقق تارگت' },
+            { id: 'BP-01', name: 'جذب و ثبت‌نام', owner: 'R-MKT', description: 'مسیر تبدیل تماس تلفنی به دانش‌آموز.' },
+            { id: 'BP-02', name: 'برگزاری رویداد', owner: 'R-EVT-M', description: 'طراحی و اجرای ایونت‌های مناسبتی.' },
+            { id: 'BP-03', name: 'تضمین کیفیت آموزش', owner: 'R-EDU', description: 'آبزرو کلاس‌ها و فیدبک به معلم.' },
+            { id: 'BP-04', name: 'مدیریت تنخواه', owner: 'R-FIN', description: 'مدیریت هزینه‌های جاری.' },
+            { id: 'BP-05', name: 'مدیریت شکایات', owner: 'R-INT', description: 'رسیدگی به اعتراضات والدین.' },
+            { id: 'BP-06', name: 'تدارکات و نظافت', owner: 'R-INT', description: 'نظافت محیط و تامین ملزومات.' },
+            { id: 'BP-07', name: 'حقوق و دستمزد', owner: 'R-FIN', description: 'محاسبه ساعات کار و پرداخت حقوق.' },
+            { id: 'BP-08', name: 'برنامه‌ریزی کلاس', owner: 'R-EDU', description: 'نیازسنجی و زمان‌بندی ترم جدید.' },
+            { id: 'BP-09', name: 'ادغام کلاس‌ها', owner: 'R-EDU', description: 'مدیریت کلاس‌های زیر حد نصاب.' },
+            { id: 'BP-10', name: 'تبلیغات', owner: 'R-MKT', description: 'استراتژی، بودجه و اجرا.' },
+            { id: 'BP-11', name: 'سوشال مدیا', owner: 'R-MKT', description: 'تقویم محتوایی و انتشار.' },
+            { id: 'BP-12', name: 'درخواست مرخصی', owner: 'R-INT', description: 'ثبت و تایید مرخصی.' },
+            { id: 'BP-13', name: 'درخواست مساعده', owner: 'R-FIN', description: 'درخواست وام یا پیش‌پرداخت.' },
+            { id: 'BP-14', name: 'استخدام اداری', owner: 'R-INT', description: 'جذب نیروهای ستادی.' },
+            { id: 'BP-15', name: 'استخدام معلم', owner: 'R-CEO', description: 'فرآیند جذب و دمو اساتید.' },
+            { id: 'BP-16', name: 'فرآیند انضباطی', owner: 'R-INT', description: 'رسیدگی به تخلفات.' },
+            { id: 'BP-17', name: 'مدیریت بحران', owner: 'R-CEO', description: 'مدیریت شرایط اضطراری.' },
+            { id: 'BP-18', name: 'حوادث آنی', owner: 'R-INT', description: 'واکنش سریع به حوادث.' },
+            { id: 'BP-19', name: 'سیاست‌گذاری کلان', owner: 'R-CEO', description: 'تعیین اهداف سالانه.' },
+            { id: 'BP-20', name: 'تولید کلیپ آموزشی', owner: 'R-EDU', description: 'تولید محتوا برای سوشال.' },
+            { id: 'BP-21', name: 'بایگانی اسناد', owner: 'R-INT', description: 'بایگانی فیزیکی و دیجیتال.' },
+            { id: 'BP-22', name: 'زیرساخت و سیستم', owner: 'R-INT', description: 'آپدیت LIMS و شبکه.' },
+            { id: 'BP-23', name: 'مدیریت گروه‌های خانواده', owner: 'R-INT', description: 'ارسال محتوا در گروه‌ها.' },
+            { id: 'BP-24', name: 'صدور کارنامه', owner: 'R-EDU', description: 'نمره‌دهی و تحویل.' },
+            { id: 'BP-25', name: 'پشتیبانی آنلاین', owner: 'R-EDU', description: 'رفع مشکلات فنی.' },
+            { id: 'BP-26', name: 'پشتیبانی آفلاین', owner: 'R-REC-S', description: 'پیگیری تلفنی.' },
+            { id: 'BP-27', name: 'پشتیبانی معلمین', owner: 'R-INT', description: 'تکثیر ورک‌شیت و تجهیزات.' },
+            { id: 'BP-28', name: 'تحقیق و توسعه (R&D)', owner: 'R-CEO', description: 'طراحی محصولات جدید.' },
+            { id: 'BP-29', name: 'خروج و تسویه', owner: 'R-INT', description: 'تسویه حساب پرسنل.' },
+            { id: 'BP-30', name: 'فروش سازمانی', owner: 'R-CEO', description: 'B2B Sales.' },
+            { id: 'BP-31', name: 'سنجش رضایت', owner: 'R-MKT', description: 'NPS.' },
+            { id: 'BP-32', name: 'انبارگردانی', owner: 'R-FIN', description: 'کنترل اموال.' },
+            { id: 'BP-33', name: 'مدیریت دانش', owner: 'R-INT', description: 'مستندسازی.' },
+            { id: 'BP-34', name: 'آزمون‌های ماک', owner: 'R-EDU', description: 'برگزاری آزمون.' },
+            { id: 'BP-35', name: 'باشگاه مشتریان', owner: 'R-MKT', description: 'Alumni.' },
+            { id: 'BP-36', name: 'آبزرو زبان‌آموزان', owner: 'R-EDU', description: 'ارزیابی نیازهای تکمیلی.' },
+            { id: 'BP-37', name: 'آموزش اساتید (TTC)', owner: 'R-EDU', description: 'ارتقای علمی معلمین.' },
+            { id: 'BP-38', name: 'طراحی کورس', owner: 'R-CEO', description: 'روند آموزشی و کتاب‌ها.' },
+            { id: 'BP-39', name: 'کمپین فصلی', owner: 'R-MKT', description: 'استراتژی کلی بازاریابی.' },
         ];
 
-        // 4. TASK MATRIX (DEEP & COMPLETE)
+        // 4. TASK MATRIX (FINAL CORRECTED)
         const tasksDB = [
             // BP-01
-            { id: 'T1-1', pid: 'BP-01', role: 'R-SAL-I', type: 'Main', desc: 'جمع‌آوری و ثبت شماره (ادمین)', freq: 'روزانه' },
-            { id: 'T1-2', pid: 'BP-01', role: 'R-SAL-P', type: 'Main', desc: 'تماس و مشاوره تلفنی', freq: 'روزانه' },
+            { id: 'T1-1', pid: 'BP-01', role: 'R-SOC', type: 'Main', desc: 'جمع‌آوری و ثبت شماره (ادمین)', freq: 'روزانه' },
+            { id: 'T1-2', pid: 'BP-01', role: 'R-SAL-P', type: 'Main', desc: 'تماس با مشاوره تلفنی', freq: 'روزانه' },
             { id: 'T1-3', pid: 'BP-01', role: 'R-SAL-I', type: 'Main', desc: 'مشاوره حضوری و متقاعدسازی', freq: 'روزانه' },
             { id: 'T1-4', pid: 'BP-01', role: 'R-EXP-H', type: 'Support', desc: 'انجام آزمون تعیین سطح', freq: 'موردی' },
             { id: 'T1-5', pid: 'BP-01', role: 'R-ADM', type: 'Main', desc: 'تکمیل پرونده', freq: 'روزانه' },
             { id: 'T1-6', pid: 'BP-01', role: 'R-REC-S', type: 'Control', desc: 'تایید نهایی پرونده و ثبت‌نام', freq: 'روزانه' },
             // BP-02
-            { id: 'T2-1', pid: 'BP-02', role: 'R-MKT', type: 'Main', desc: 'تعیین استراتژی کلی رویداد', freq: 'فصلی' },
-            { id: 'T2-2', pid: 'BP-02', role: 'R-EVT-M', type: 'Main', desc: 'مدیریت و برنامه‌ریزی اجرایی', freq: 'موردی' },
-            { id: 'T2-3', pid: 'BP-02', role: 'R-EVT-O', type: 'Main', desc: 'مسئول اجرایی (هماهنگی‌های ریز)', freq: 'موردی' },
+            { id: 'T2-1', pid: 'BP-02', role: 'R-MKT', type: 'Main', desc: 'مدیریت مارکتینگ و استراتژی', freq: 'فصلی' },
+            { id: 'T2-2', pid: 'BP-02', role: 'R-EVT-M', type: 'Main', desc: 'مدیر ایونت (آتوسا)', freq: 'موردی' },
+            { id: 'T2-3', pid: 'BP-02', role: 'R-EVT-O', type: 'Main', desc: 'مسئول اجرایی (خالی - پرنیان)', freq: 'موردی' },
             { id: 'T2-4', pid: 'BP-02', role: 'R-INT', type: 'Control', desc: 'نظر کارشناسی و بررسی طرح', freq: 'موردی' },
-            { id: 'T2-5', pid: 'BP-02', role: 'R-FIN', type: 'Control', desc: 'تایید مالی', freq: 'موردی' },
-            { id: 'T2-6', pid: 'BP-02', role: 'R-EVT-O', type: 'Support', desc: 'خرید و تدارکات', freq: 'موردی' },
-            { id: 'T2-7', pid: 'BP-02', role: 'R-REC-S', type: 'Main', desc: 'تبلیغات و دعوت تلفنی', freq: 'روزانه' },
-            { id: 'T2-8', pid: 'BP-02', role: 'R-REC-S', type: 'Main', desc: 'جذب و ثبت‌نام شرکت‌کنندگان', freq: 'روزانه' },
-            { id: 'T2-9', pid: 'BP-02', role: 'R-EVT-M', type: 'Main', desc: 'اجرا و نظم‌دهی در روز رویداد', freq: 'روز رویداد' },
+            { id: 'T2-5', pid: 'BP-02', role: 'R-FIN', type: 'Control', desc: 'مدیریت مالی و بودجه', freq: 'موردی' },
+            { id: 'T2-6', pid: 'BP-02', role: 'R-EVT-O', type: 'Support', desc: 'خرید و تدارکات اجرایی', freq: 'موردی' },
+            { id: 'T2-7', pid: 'BP-02', role: 'R-REC-S', type: 'Main', desc: 'تبلیغات و دعوت (رسپشن)', freq: 'روزانه' },
+            { id: 'T2-8', pid: 'BP-02', role: 'R-REC-S', type: 'Main', desc: 'جذب و ثبت‌نام (رسپشن)', freq: 'روزانه' },
+            { id: 'T2-9', pid: 'BP-02', role: 'R-EVT-M', type: 'Main', desc: 'اجرا و نظم‌دهی', freq: 'روز رویداد' },
             { id: 'T2-10', pid: 'BP-02', role: 'R-EVT-M', type: 'Control', desc: 'بایگانی و گزارش نهایی', freq: 'پس از رویداد' },
             // BP-03
-            { id: 'T3-1', pid: 'BP-03', role: 'R-EXP-H', type: 'Main', desc: 'تدوین جدول زمان‌بندی آبزرو', freq: 'ماهانه' },
-            { id: 'T3-2', pid: 'BP-03', role: 'R-EXP-H', type: 'Main', desc: 'حضور در کلاس و تکمیل چک‌لیست', freq: 'هفتگی' },
+            { id: 'T3-1', pid: 'BP-03', role: 'R-EXP-H', type: 'Main', desc: 'جدول زمان‌بندی (الهه)', freq: 'ماهانه' },
+            { id: 'T3-2', pid: 'BP-03', role: 'R-EXP-H', type: 'Main', desc: 'حضور در کلاس و تکمیل چک‌لیست (الهه)', freq: 'هفتگی' },
             { id: 'T3-3', pid: 'BP-03', role: 'R-EDU', type: 'Control', desc: 'بررسی گزارش‌های آبزرو و امتیازدهی', freq: 'هفتگی' },
-            { id: 'T3-4', pid: 'BP-03', role: 'R-EDU', type: 'Main', desc: 'جلسه بازخورد هفتگی با معلم', freq: 'هفتگی' },
-            { id: 'T3-5', pid: 'BP-03', role: 'R-EDU', type: 'Main', desc: 'ارائه طرح پیشنهادی آموزش تیچرها', freq: 'فصلی' },
+            { id: 'T3-4', pid: 'BP-03', role: 'R-EDU', type: 'Main', desc: 'جلسه بازخورد هفتگی با معلم (افسانه/الهه)', freq: 'هفتگی' },
+            { id: 'T3-5', pid: 'BP-03', role: 'R-EDU', type: 'Main', desc: 'طرح پیشنهادی آموزش تیچرها', freq: 'فصلی' },
+            { id: 'T3-6', pid: 'BP-03', role: 'R-EDU', type: 'Control', desc: 'گزارش ماهانه طرح پیشنهادی به مدیریت', freq: 'ماهانه' },
             // BP-04
             { id: 'T4-1', pid: 'BP-04', role: 'R-ADM', type: 'Main', desc: 'درخواست هزینه و خرید کالا', freq: 'هفتگی' },
             { id: 'T4-2', pid: 'BP-04', role: 'R-FIN', type: 'Main', desc: 'شارژ حساب تنخواه', freq: 'هفتگی' },
             { id: 'T4-3', pid: 'BP-04', role: 'R-ADM', type: 'Main', desc: 'انجام خرید', freq: 'هفتگی' },
             { id: 'T4-4', pid: 'BP-04', role: 'R-FIN', type: 'Control', desc: 'ثبت خرید و فاکتور', freq: 'هفتگی' },
             // BP-05
-            { id: 'T5-1', pid: 'BP-05', role: 'R-REC-S', type: 'Main', desc: 'دریافت شکایت و آرام‌سازی اولیه', freq: 'آنی' },
-            { id: 'T5-2', pid: 'BP-05', role: 'R-REC-S', type: 'Support', desc: 'جمع‌آوری اطلاعات شکایت', freq: 'آنی' },
+            { id: 'T5-1', pid: 'BP-05', role: 'R-REC-S', type: 'Main', desc: 'دریافت شکایت', freq: 'آنی' },
+            { id: 'T5-2', pid: 'BP-05', role: 'R-REC-S', type: 'Support', desc: 'آرام‌بخشی اولیه', freq: 'آنی' },
             { id: 'T5-3', pid: 'BP-05', role: 'R-INT', type: 'Main', desc: 'بررسی مساله با شاکی', freq: 'موردی' },
-            { id: 'T5-4', pid: 'BP-05', role: 'R-EDU', type: 'Support', desc: 'کارشناسی فنی (اگر آموزشی باشد)', freq: 'موردی' },
+            { id: 'T5-4', pid: 'BP-05', role: 'R-EDU', type: 'Support', desc: 'کارشناسی فنی', freq: 'موردی' },
             { id: 'T5-5', pid: 'BP-05', role: 'R-INT', type: 'Control', desc: 'اعلام نتیجه نهایی و پاسخگویی', freq: 'موردی' },
+            { id: 'T5-6', pid: 'BP-05', role: 'R-REC-S', type: 'Support', desc: 'جمع‌آوری اطلاعات برای جلسه سیستم', freq: 'هفتگی' },
             // BP-06
-            { id: 'T6-1', pid: 'BP-06', role: 'R-ADM', type: 'Main', desc: 'چک کردن طبق چک‌لیست نظافت', freq: 'روزانه' },
+            { id: 'T6-1', pid: 'BP-06', role: 'R-ADM', type: 'Main', desc: 'چک کردن طبق چک‌لیست', freq: 'روزانه' },
             { id: 'T6-2', pid: 'BP-06', role: 'R-REC-S', type: 'Control', desc: 'بازرسی محیطی', freq: 'روزانه' },
             { id: 'T6-3', pid: 'BP-06', role: 'R-REC-S', type: 'Main', desc: 'گزارش نهایی بازرسی', freq: 'روزانه' },
             // BP-07
-            { id: 'T7-1', pid: 'BP-07', role: 'R-REC-S', type: 'Main', desc: 'ارسال کارکرد پرسنل اداری', freq: 'ماهانه' },
+            { id: 'T7-1', pid: 'BP-07', role: 'R-REC-S', type: 'Main', desc: 'ارسال کارکرد پرسنل', freq: 'ماهانه' },
             { id: 'T7-2', pid: 'BP-07', role: 'R-EDU', type: 'Main', desc: 'ارسال کارکرد معلمین', freq: 'ماهانه' },
-            { id: 'T7-3', pid: 'BP-07', role: 'R-FIN', type: 'Main', desc: 'محاسبه حقوق و کسورات', freq: 'ماهانه' },
-            { id: 'T7-4', pid: 'BP-07', role: 'R-CEO', type: 'Control', desc: 'تایید نهایی لیست پرداخت', freq: 'ماهانه' },
+            { id: 'T7-3', pid: 'BP-07', role: 'R-FIN', type: 'Main', desc: 'محاسبه حقوق', freq: 'ماهانه' },
+            { id: 'T7-4', pid: 'BP-07', role: 'R-CEO', type: 'Control', desc: 'تایید نهایی', freq: 'ماهانه' },
             { id: 'T7-5', pid: 'BP-07', role: 'R-FIN', type: 'Main', desc: 'واریز حقوق', freq: 'ماهانه' },
             // BP-08
-            { id: 'T8-1', pid: 'BP-08', role: 'R-REC-S', type: 'Support', desc: 'استخراج لیست انتظار', freq: 'فصلی' },
-            { id: 'T8-2', pid: 'BP-08', role: 'R-ADM', type: 'Main', desc: 'دریافت فرم Availability مدرسین', freq: 'فصلی' },
+            { id: 'T8-1', pid: 'BP-08', role: 'R-REC-S', type: 'Support', desc: 'ارائه آمار پیش‌ثبت‌نام', freq: 'فصلی' },
+            { id: 'T8-2', pid: 'BP-08', role: 'R-ADM', type: 'Main', desc: 'دریافت فرم Availability', freq: 'فصلی' },
             { id: 'T8-3', pid: 'BP-08', role: 'R-EXP-H', type: 'Main', desc: 'چیدمان اولیه جدول کلاس‌ها', freq: 'فصلی' },
-            { id: 'T8-4', pid: 'BP-08', role: 'R-ADM', type: 'Support', desc: 'بررسی تداخل اتاق/زمان', freq: 'فصلی' },
-            { id: 'T8-5', pid: 'BP-08', role: 'R-EDU', type: 'Control', desc: 'تایید نهایی برنامه', freq: 'فصلی' },
-            { id: 'T8-6', pid: 'BP-08', role: 'R-ADM', type: 'Main', desc: 'ورود اطلاعات در LIMS', freq: 'فصلی' },
+            { id: 'T8-4', pid: 'BP-08', role: 'R-EDU', type: 'Control', desc: 'تایید نهایی برنامه', freq: 'فصلی' },
+            { id: 'T8-5', pid: 'BP-08', role: 'R-ADM', type: 'Main', desc: 'ورود اطلاعات در LIMS', freq: 'فصلی' },
             // BP-09
-            { id: 'T9-1', pid: 'BP-09', role: 'R-ADM', type: 'Main', desc: 'شناسایی کلاس‌های زیر حد نصاب', freq: 'شروع ترم' },
-            { id: 'T9-2', pid: 'BP-09', role: 'R-EXP-H', type: 'Main', desc: 'امکان‌سنجی علمی ادغام', freq: 'موردی' },
-            { id: 'T9-3', pid: 'BP-09', role: 'R-FIN', type: 'Support', desc: 'محاسبه زیان انحلال', freq: 'موردی' },
-            { id: 'T9-4', pid: 'BP-09', role: 'R-SAL-I', type: 'Main', desc: 'مذاکره حساس با والدین', freq: 'موردی' },
-            { id: 'T9-5', pid: 'BP-09', role: 'R-ADM', type: 'Main', desc: 'اعمال تغییرات در سیستم', freq: 'موردی' },
+            { id: 'T9-1', pid: 'BP-09', role: 'R-REC-S', type: 'Main', desc: 'گزارش کلاس‌های زیر حد نصاب', freq: 'شروع ترم' },
+            { id: 'T9-2', pid: 'BP-09', role: 'R-EDU', type: 'Control', desc: 'تصمیم‌گیری برای ادغام', freq: 'شروع ترم' },
+            { id: 'T9-3', pid: 'BP-09', role: 'R-SAL-I', type: 'Main', desc: 'مذاکره با والدین برای جابجایی', freq: 'شروع ترم' },
+            { id: 'T9-4', pid: 'BP-09', role: 'R-FIN', type: 'Support', desc: 'محاسبه مابه‌التفاوت شهریه', freq: 'شروع ترم' },
             // BP-10
             { id: 'T10-1', pid: 'BP-10', role: 'R-MKT', type: 'Main', desc: 'تدوین استراتژی تبلیغات', freq: 'فصلی' },
             { id: 'T10-2', pid: 'BP-10', role: 'R-FIN', type: 'Main', desc: 'تامین مالی', freq: 'فصلی' },
-            { id: 'T10-3', pid: 'BP-10', role: 'R-EVT-M', type: 'Support', desc: 'آماده‌سازی زیرساخت', freq: 'فصلی' },
+            { id: 'T10-3', pid: 'BP-10', role: 'R-EVT-M', type: 'Support', desc: 'آماده‌سازی زیرساخت (آتوسا)', freq: 'فصلی' },
             { id: 'T10-4', pid: 'BP-10', role: 'R-MKT', type: 'Main', desc: 'هماهنگی و اجرای تبلیغ', freq: 'فصلی' },
             { id: 'T10-5', pid: 'BP-10', role: 'R-EVT-M', type: 'Main', desc: 'درخواست ثبت Lead', freq: 'روزانه' },
-            { id: 'T10-6', pid: 'BP-10', role: 'R-EVT-M', type: 'Control', desc: 'گزارش نرخ تبدیل', freq: 'پایان کمپین' },
+            { id: 'T10-6', pid: 'BP-10', role: 'R-EVT-M', type: 'Control', desc: 'گزارش نرخ تبدیل (آتوسا)', freq: 'پایان کمپین' },
             // BP-11
-            { id: 'T11-1', pid: 'BP-11', role: 'R-MKT', type: 'Main', desc: 'تدوین برنامه محتوایی', freq: 'ماهانه' },
-            { id: 'T11-2', pid: 'BP-11', role: 'R-EVT-M', type: 'Main', desc: 'آماده‌سازی تقویم اجرایی', freq: 'ماهانه' },
-            { id: 'T11-3', pid: 'BP-11', role: 'R-EVT-M', type: 'Support', desc: 'هماهنگی عوامل اجرایی', freq: 'هفتگی' },
-            { id: 'T11-4', pid: 'BP-11', role: 'R-EVT-M', type: 'Main', desc: 'انتشار محتوا', freq: 'روزانه' },
-            { id: 'T11-5', pid: 'BP-11', role: 'R-MKT', type: 'Control', desc: 'تحلیل و نظارت', freq: 'هفتگی' },
+            { id: 'T11-1', pid: 'BP-11', role: 'R-MKT', type: 'Main', desc: 'تدوین برنامه تقویم محتوایی', freq: 'ماهانه' },
+            { id: 'T11-2', pid: 'BP-11', role: 'R-EVT-M', type: 'Main', desc: 'آماده‌سازی تقویم اجرایی (آتوسا)', freq: 'ماهانه' },
+            { id: 'T11-3', pid: 'BP-11', role: 'R-EVT-M', type: 'Support', desc: 'هماهنگی عوامل اجرایی (آتوسا)', freq: 'هفتگی' },
+            { id: 'T11-4', pid: 'BP-11', role: 'R-EVT-M', type: 'Main', desc: 'انتشار محتوا (استوری/پست)', freq: 'روزانه' },
+            { id: 'T11-5', pid: 'BP-11', role: 'R-MKT', type: 'Control', desc: 'تحلیل و نظارت اجرای برنامه', freq: 'هفتگی' },
             // BP-12
             { id: 'T12-1', pid: 'BP-12', role: 'R-REC-S', type: 'Main', desc: 'درخواست مرخصی', freq: 'موردی' },
-            { id: 'T12-2', pid: 'BP-12', role: 'R-EXP-H', type: 'Support', desc: 'تعیین معلم جایگزین (Sub)', freq: 'موردی' },
+            { id: 'T12-2', pid: 'BP-12', role: 'R-EXP-H', type: 'Support', desc: 'تعیین معلم جایگزین', freq: 'موردی' },
             { id: 'T12-3', pid: 'BP-12', role: 'R-INT', type: 'Control', desc: 'تایید نهایی مرخصی', freq: 'موردی' },
             { id: 'T12-4', pid: 'BP-12', role: 'R-ADM', type: 'Support', desc: 'ثبت در سیستم حضور غیاب', freq: 'موردی' },
             // BP-13
             { id: 'T13-1', pid: 'BP-13', role: 'R-FIN', type: 'Main', desc: 'بررسی درخواست مساعده', freq: 'موردی' },
             { id: 'T13-2', pid: 'BP-13', role: 'R-CEO', type: 'Control', desc: 'تایید نهایی', freq: 'موردی' },
             // BP-14
-            { id: 'T14-1', pid: 'BP-14', role: 'R-INT', type: 'Main', desc: 'شناسایی نیاز نیرو', freq: 'موردی' },
-            { id: 'T14-2', pid: 'BP-14', role: 'R-ADM', type: 'Main', desc: 'انتشار آگهی استخدام', freq: 'موردی' },
-            { id: 'T14-3', pid: 'BP-14', role: 'R-ADM', type: 'Support', desc: 'غربالگری اولیه', freq: 'موردی' },
-            { id: 'T14-4', pid: 'BP-14', role: 'R-INT', type: 'Main', desc: 'مصاحبه تخصصی', freq: 'موردی' },
-            { id: 'T14-5', pid: 'BP-14', role: 'R-CEO', type: 'Control', desc: 'گزینش نهایی', freq: 'موردی' },
+            { id: 'T14-1', pid: 'BP-14', role: 'R-INT', type: 'Main', desc: 'انتشار آگهی استخدام اداری', freq: 'موردی' },
+            { id: 'T14-2', pid: 'BP-14', role: 'R-ADM', type: 'Support', desc: 'غربالگری اولیه', freq: 'موردی' },
+            { id: 'T14-3', pid: 'BP-14', role: 'R-INT', type: 'Main', desc: 'مصاحبه عمومی', freq: 'موردی' },
+            { id: 'T14-4', pid: 'BP-14', role: 'R-CEO', type: 'Control', desc: 'تایید نهایی', freq: 'موردی' },
             // BP-15
-            { id: 'T15-1', pid: 'BP-15', role: 'R-MKT', type: 'Main', desc: 'تبلیغات جذب مدرس', freq: 'موردی' },
-            { id: 'T15-2', pid: 'BP-15', role: 'R-CEO', type: 'Main', desc: 'بررسی رزومه', freq: 'موردی' },
+            { id: 'T15-1', pid: 'BP-15', role: 'R-MKT', type: 'Main', desc: 'تبلیغات و جمع‌آوری Lead', freq: 'موردی' },
+            { id: 'T15-2', pid: 'BP-15', role: 'R-CEO', type: 'Main', desc: 'بررسی رزومه (مدیر دپارتمان آموزش)', freq: 'موردی' },
             { id: 'T15-3', pid: 'BP-15', role: 'R-INT', type: 'Support', desc: 'هماهنگی مصاحبه', freq: 'موردی' },
-            { id: 'T15-4', pid: 'BP-15', role: 'R-EDU', type: 'Main', desc: 'برگزاری دمو', freq: 'موردی' },
-            { id: 'T15-5', pid: 'BP-15', role: 'R-CEO', type: 'Control', desc: 'تایید نهایی', freq: 'موردی' },
+            { id: 'T15-4', pid: 'BP-15', role: 'R-EDU', type: 'Main', desc: 'برگزاری جلسه دمو', freq: 'موردی' },
+            { id: 'T15-5', pid: 'BP-15', role: 'R-EDU', type: 'Main', desc: 'گزارش نهایی سطح مدرس', freq: 'موردی' },
+            { id: 'T15-6', pid: 'BP-15', role: 'R-CEO', type: 'Control', desc: 'تایید نهایی', freq: 'موردی' },
+            { id: 'T15-7', pid: 'BP-15', role: 'R-INT', type: 'Support', desc: 'عقد قرارداد', freq: 'موردی' },
             // BP-16
-            { id: 'T16-1', pid: 'BP-16', role: 'R-REC-S', type: 'Main', desc: 'گزارش تخلف', freq: 'موردی' },
-            { id: 'T16-2', pid: 'BP-16', role: 'R-INT', type: 'Control', desc: 'بررسی مستندات', freq: 'موردی' },
-            { id: 'T16-3', pid: 'BP-16', role: 'R-CEO', type: 'Control', desc: 'صدور حکم', freq: 'موردی' },
+            { id: 'T16-1', pid: 'BP-16', role: 'R-REC-S', type: 'Main', desc: 'گزارش تخلف (شاخه اداری)', freq: 'موردی' },
+            { id: 'T16-2', pid: 'BP-16', role: 'R-INT', type: 'Control', desc: 'بررسی تخلف (شاخه اداری)', freq: 'موردی' },
+            { id: 'T16-3', pid: 'BP-16', role: 'R-CEO', type: 'Control', desc: 'حکم نهایی (شاخه اداری)', freq: 'موردی' },
+            { id: 'T16-4', pid: 'BP-16', role: 'R-EDU', type: 'Main', desc: 'بررسی تخلف (شاخه آموزشی)', freq: 'موردی' },
+            { id: 'T16-5', pid: 'BP-16', role: 'R-CEO', type: 'Control', desc: 'حکم نهایی (شاخه آموزشی)', freq: 'موردی' },
             // BP-17
             { id: 'T17-1', pid: 'BP-17', role: 'R-INT', type: 'Main', desc: 'شناسایی بحران', freq: 'آنی' },
             { id: 'T17-2', pid: 'BP-17', role: 'R-CEO', type: 'Main', desc: 'کمیته اضطرار', freq: 'آنی' },
+            { id: 'T17-3', pid: 'BP-17', role: 'R-INT', type: 'Support', desc: 'اطلاع‌رسانی مجازی و تلفنی', freq: 'آنی' },
             // BP-18
             { id: 'T18-1', pid: 'BP-18', role: 'R-REC-S', type: 'Main', desc: 'تخلیه اضطراری', freq: 'آنی' },
             { id: 'T18-2', pid: 'BP-18', role: 'R-INT', type: 'Control', desc: 'مدیریت صحنه', freq: 'آنی' },
             // BP-19
             { id: 'T19-1', pid: 'BP-19', role: 'R-CEO', type: 'Main', desc: 'استراتژی سالانه', freq: 'سالانه' },
             // BP-20
-            { id: 'T20-1', pid: 'BP-20', role: 'R-EXP-H', type: 'Main', desc: 'تقویم موضوعی کلیپ', freq: 'ماهانه' },
-            { id: 'T20-2', pid: 'BP-20', role: 'R-EDU', type: 'Control', desc: 'تایید سناریو', freq: 'موردی' },
-            { id: 'T20-3', pid: 'BP-20', role: 'R-EVT-O', type: 'Main', desc: 'ضبط ویدیو', freq: 'هفتگی' },
-            { id: 'T20-4', pid: 'BP-20', role: 'R-MKT', type: 'Main', desc: 'تدوین و گرافیک', freq: 'هفتگی' },
-            { id: 'T20-5', pid: 'BP-20', role: 'R-SAL-I', type: 'Main', desc: 'انتشار', freq: 'هفتگی' },
+            { id: 'T20-1', pid: 'BP-20', role: 'R-EDU', type: 'Main', desc: 'سناریو و موضوع کلیپ (افسانه)', freq: 'هفتگی' },
+            { id: 'T20-2', pid: 'BP-20', role: 'R-EVT-M', type: 'Main', desc: 'ضبط ویدیو', freq: 'هفتگی' },
+            { id: 'T20-3', pid: 'BP-20', role: 'R-EVT-M', type: 'Main', desc: 'تدوین (تیم مدیا/آتوسا)', freq: 'هفتگی' },
+            { id: 'T20-4', pid: 'BP-20', role: 'R-SOC', type: 'Main', desc: 'انتشار در سوشال', freq: 'هفتگی' },
             // BP-21
-            { id: 'T21-1', pid: 'BP-21', role: 'R-ADM', type: 'Main', desc: 'دریافت و چک‌لیست مدارک', freq: 'روزانه' },
-            { id: 'T21-2', pid: 'BP-21', role: 'R-ADM', type: 'Main', desc: 'اسکن و آپلود', freq: 'روزانه' },
-            { id: 'T21-3', pid: 'BP-21', role: 'R-ADM', type: 'Main', desc: 'فایل‌بندی فیزیکی', freq: 'هفتگی' },
-            { id: 'T21-4', pid: 'BP-21', role: 'R-INT', type: 'Control', desc: 'پاکسازی دوره‌ای', freq: 'شش‌ماهه' },
+            { id: 'T21-1', pid: 'BP-21', role: 'R-ADM', type: 'Main', desc: 'بایگانی فیزیکی زونکن', freq: 'هفتگی' },
+            { id: 'T21-2', pid: 'BP-21', role: 'R-ADM', type: 'Main', desc: 'اسکن و بایگانی دیجیتال', freq: 'روزانه' },
             // BP-22
             { id: 'T22-1', pid: 'BP-22', role: 'R-ADM', type: 'Main', desc: 'چک‌لیست صبحگاهی', freq: 'روزانه' },
             { id: 'T22-2', pid: 'BP-22', role: 'R-ADM', type: 'Main', desc: 'آپدیت LIMS', freq: 'شروع ترم' },
             { id: 'T22-3', pid: 'BP-22', role: 'R-INT', type: 'Main', desc: 'تماس با پشتیبان فنی', freq: 'آنی' },
-            { id: 'T22-4', pid: 'BP-22', role: 'R-INT', type: 'Main', desc: 'بک‌آپ دیتابیس', freq: 'هفتگی' },
             // BP-23
             { id: 'T23-1', pid: 'BP-23', role: 'R-ADM', type: 'Main', desc: 'ساخت گروه واتس‌اپ', freq: 'شروع ترم' },
             { id: 'T23-2', pid: 'BP-23', role: 'R-REC-S', type: 'Main', desc: 'پین کردن قوانین', freq: 'شروع ترم' },
@@ -271,8 +260,9 @@
             { id: 'T24-1', pid: 'BP-24', role: 'R-EDU', type: 'Main', desc: 'پیگیری نمرات', freq: 'پایان ترم' },
             { id: 'T24-2', pid: 'BP-24', role: 'R-ADM', type: 'Support', desc: 'چاپ کارنامه', freq: 'پایان ترم' },
             { id: 'T24-3', pid: 'BP-24', role: 'R-SAL-I', type: 'Main', desc: 'تحویل و مشاوره', freq: 'پایان ترم' },
-            // BP-25
+            // BP-25 (Fixed: Removed Zahra)
             { id: 'T25-1', pid: 'BP-25', role: 'R-EXP-O', type: 'Main', desc: 'مانیتورینگ آنلاین', freq: 'روزانه' },
+            { id: 'T25-2', pid: 'BP-25', role: 'R-EXP-O', type: 'Main', desc: 'ارسال یوزر/پسورد', freq: 'موردی' },
             // BP-26
             { id: 'T26-1', pid: 'BP-26', role: 'R-ADM', type: 'Main', desc: 'استخراج غایبین', freq: 'روزانه' },
             { id: 'T26-2', pid: 'BP-26', role: 'R-REC-S', type: 'Main', desc: 'تماس پیگیری', freq: 'روزانه' },
@@ -283,13 +273,9 @@
             { id: 'T28-1', pid: 'BP-28', role: 'R-MKT', type: 'Main', desc: 'پیشنهاد ایده', freq: 'فصلی' },
             // BP-29
             { id: 'T29-1', pid: 'BP-29', role: 'R-INT', type: 'Main', desc: 'ثبت استعفا', freq: 'موردی' },
-            { id: 'T29-2', pid: 'BP-29', role: 'R-ADM', type: 'Support', desc: 'تحویل اموال', freq: 'موردی' },
-            { id: 'T29-3', pid: 'BP-29', role: 'R-FIN', type: 'Control', desc: 'تسویه نهایی', freq: 'موردی' },
-            // BP-30
+            // BP-30 (Removed Saghi)
             { id: 'T30-1', pid: 'BP-30', role: 'R-MKT', type: 'Main', desc: 'لیست‌برداری هدف', freq: 'فصلی' },
-            { id: 'T30-2', pid: 'BP-30', role: 'R-SAL-P', type: 'Main', desc: 'تماس سرد (Cold Call)', freq: 'هفتگی' },
-            { id: 'T30-3', pid: 'BP-30', role: 'R-CEO', type: 'Main', desc: 'مذاکره حضوری', freq: 'موردی' },
-            { id: 'T30-4', pid: 'BP-30', role: 'R-EDU', type: 'Support', desc: 'ارائه پروپوزال', freq: 'موردی' },
+            { id: 'T30-2', pid: 'BP-30', role: 'R-CEO', type: 'Main', desc: 'مذاکره حضوری', freq: 'موردی' },
             // BP-31
             { id: 'T31-1', pid: 'BP-31', role: 'R-MKT', type: 'Main', desc: 'طراحی سوالات', freq: 'فصلی' },
             { id: 'T31-2', pid: 'BP-31', role: 'R-ADM', type: 'Main', desc: 'ارسال پیامک نظرسنجی', freq: 'ترمیک' },
@@ -297,128 +283,61 @@
             // BP-32
             { id: 'T32-1', pid: 'BP-32', role: 'R-ADM', type: 'Main', desc: 'لیست‌برداری اموال', freq: 'سالانه' },
             // BP-33
-            { id: 'T33-1', pid: 'BP-33', role: 'R-INT', type: 'Main', desc: 'شناسایی گپ دانشی', freq: 'ماهانه' },
+            { id: 'T33-1', pid: 'BP-33', role: 'R-INT', type: 'Main', desc: 'شناسایی گپ دانشی (Knowledge Gap)', freq: 'ماهانه' },
             { id: 'T33-2', pid: 'BP-33', role: 'R-ADM', type: 'Main', desc: 'تدوین SOP مکتوب', freq: 'موردی' },
-            // BP-34
+            // BP-34 (Updated)
             { id: 'T34-1', pid: 'BP-34', role: 'R-EDU', type: 'Main', desc: 'تقویم‌ریزی ماک', freq: 'سالانه' },
             { id: 'T34-2', pid: 'BP-34', role: 'R-MKT', type: 'Main', desc: 'کمپین جذب داوطلب', freq: 'ماهانه' },
             { id: 'T34-3', pid: 'BP-34', role: 'R-SAL-I', type: 'Main', desc: 'ثبت‌نام', freq: 'روزانه' },
-            { id: 'T34-4', pid: 'BP-34', role: 'R-EXP-H', type: 'Main', desc: 'مراقبت آزمون', freq: 'روز آزمون' },
-            { id: 'T34-5', pid: 'BP-34', role: 'R-EDU', type: 'Control', desc: 'تصحیح و کارنامه', freq: 'هفتگی' },
+            { id: 'T34-4', pid: 'BP-34', role: 'R-ADM', type: 'Main', desc: 'تکثیر و چیدمان سالن', freq: 'روز آزمون' },
+            { id: 'T34-5', pid: 'BP-34', role: 'R-EXP-H', type: 'Main', desc: 'مراقبت آزمون (Proctoring)', freq: 'روز آزمون' },
+            { id: 'T34-6', pid: 'BP-34', role: 'R-EDU', type: 'Control', desc: 'تصحیح و کارنامه', freq: 'هفتگی' },
             // BP-35
             { id: 'T35-1', pid: 'BP-35', role: 'R-ADM', type: 'Main', desc: 'استخراج عدم ثبت‌نامی‌ها', freq: 'پایان ترم' },
             { id: 'T35-2', pid: 'BP-35', role: 'R-SAL-P', type: 'Main', desc: 'تماس علت‌یابی', freq: 'هفتگی' },
-            { id: 'T35-3', pid: 'BP-35', role: 'R-MKT', type: 'Main', desc: 'طراحی آفر بازگشت', freq: 'موردی' },
             // BP-36
-            { id: 'T36-1', pid: 'BP-36', role: 'R-EXP-H', type: 'Main', desc: 'آبزرو زبان‌آموز', freq: 'ترمیک' },
+            { id: 'T36-1', pid: 'BP-36', role: 'R-EXP-H', type: 'Main', desc: 'آبزرو زبان‌آموز (هماهنگی الهه/خانم دکتر)', freq: 'ترمیک' },
+            { id: 'T36-2', pid: 'BP-36', role: 'R-EXP-H', type: 'Main', desc: 'گزارش نیاز کلاس تکمیلی', freq: 'موردی' },
+            { id: 'T36-3', pid: 'BP-36', role: 'R-EDU', type: 'Control', desc: 'تصمیم‌گیری نهایی (افسانه/خانم دکتر)', freq: 'موردی' },
             // BP-37
-            { id: 'T37-1', pid: 'BP-37', role: 'R-EDU', type: 'Main', desc: 'برگزاری TTC', freq: 'موردی' },
+            { id: 'T37-1', pid: 'BP-37', role: 'R-EXP-H', type: 'Main', desc: 'گزارش ماهانه نیازسنجی', freq: 'ماهانه' },
+            { id: 'T37-2', pid: 'BP-37', role: 'R-CEO', type: 'Control', desc: 'تصمیم‌گیری و گروه‌بندی', freq: 'ماهانه' },
+            { id: 'T37-3', pid: 'BP-37', role: 'R-EDU', type: 'Main', desc: 'پیاده‌سازی و اجرا', freq: 'موردی' },
             // BP-38
-            { id: 'T38-1', pid: 'BP-38', role: 'R-CEO', type: 'Main', desc: 'استراتژی آموزشی', freq: 'فصلی' },
+            { id: 'T38-1', pid: 'BP-38', role: 'R-CEO', type: 'Main', desc: 'استراتژی آموزشی فصل', freq: 'فصلی' },
+            { id: 'T38-2', pid: 'BP-38', role: 'R-CEO', type: 'Main', desc: 'طرح اولیه ساختار', freq: 'فصلی' },
+            { id: 'T38-3', pid: 'BP-38', role: 'R-EDU', type: 'Main', desc: 'آماده‌سازی و تکمیل طرح', freq: 'موردی' },
+            { id: 'T38-4', pid: 'BP-38', role: 'R-EDU', type: 'Control', desc: 'گزارش به مدیریت', freq: 'موردی' },
             // BP-39
-            { id: 'T39-1', pid: 'BP-39', role: 'R-MKT', type: 'Main', desc: 'استراتژی کمپین', freq: 'فصلی' },
-            { id: 'T39-2', pid: 'BP-39', role: 'R-EVT-M', type: 'Main', desc: 'ابلاغ پروسه اجرایی', freq: 'فصلی' },
+            { id: 'T39-1', pid: 'BP-39', role: 'R-MKT', type: 'Main', desc: 'تعیین استراتژی کلی', freq: 'فصلی' },
+            { id: 'T39-2', pid: 'BP-39', role: 'R-FIN', type: 'Main', desc: 'پیشنهاد و تخمین مالی', freq: 'فصلی' },
+            { id: 'T39-3', pid: 'BP-39', role: 'R-CEO', type: 'Control', desc: 'بازبینی و کارشناسی', freq: 'فصلی' },
+            { id: 'T39-4', pid: 'BP-39', role: 'R-EVT-M', type: 'Main', desc: 'ابلاغ و تدوین پروسه', freq: 'فصلی' },
         ];
 
         function EnglishLandBPM() {
-            const [activeTab, setActiveTab] = useState('dashboard');
+            const [activeTab, setActiveTab] = useState('dept');
             const [selectedDept, setSelectedDept] = useState(null);
-            const [selectedProcess, setSelectedProcess] = useState('BP-01');
-            const [selectedRoleForJD, setSelectedRoleForJD] = useState(null);
 
-            // ANALYTICS CALCS
-            const stats = useMemo(() => {
-                const totalProcesses = processesDB.length;
-                const totalTasks = tasksDB.length;
-                const roleWorkload = {};
-                tasksDB.forEach(t => {
-                    if (!roleWorkload[t.role]) roleWorkload[t.role] = { main: 0, support: 0 };
-                    if (t.type === 'Main') roleWorkload[t.role].main++;
-                    else roleWorkload[t.role].support++;
-                });
-                const busyRoles = Object.entries(roleWorkload)
-                    .map(([rId, counts]) => ({ 
-                        id: rId, 
-                        total: counts.main + counts.support,
-                        main: counts.main,
-                        support: counts.support,
-                        name: rolesDB.find(r => r.id === rId)?.title 
-                    }))
-                    .sort((a, b) => b.total - a.total)
-                    .slice(0, 5);
-                return { totalProcesses, totalTasks, busyRoles };
-            }, []);
-
-            // RACI CALCS
-            const raciMatrix = useMemo(() => {
-                const matrix = {};
-                processesDB.forEach(p => {
-                    matrix[p.id] = {};
-                    matrix[p.id][p.owner] = 'A';
-                    tasksDB.filter(t => t.pid === p.id).forEach(t => {
-                        if (matrix[p.id][t.role] === 'A') return;
-                        if (t.type === 'Main') matrix[p.id][t.role] = 'R';
-                        else if (t.type === 'Control') matrix[p.id][t.role] = 'C';
-                        else matrix[p.id][t.role] = 'I';
-                    });
-                });
-                return matrix;
-            }, []);
-
-            // DEPT LOGIC
             const deptRoles = useMemo(() => selectedDept ? rolesDB.filter(r => r.dept === selectedDept) : [], [selectedDept]);
             const getRoleTasks = (roleId) => tasksDB.filter(t => t.role === roleId).map(t => ({ ...t, procName: processesDB.find(p => p.id === t.pid)?.name }));
 
-            // BPMN LOGIC
-            const bpmnData = useMemo(() => {
-                const tasks = tasksDB.filter(t => t.pid === selectedProcess);
-                const involvedRoles = [...new Set(tasks.map(t => t.role))];
-                involvedRoles.sort((a, b) => rolesDB.findIndex(r => r.id === a) - rolesDB.findIndex(r => r.id === b));
-                return { tasks, involvedRoles };
-            }, [selectedProcess]);
-
-            // HELPER
-            const getJD = (roleId) => tasksDB.filter(t => t.role === roleId).map(t => ({ ...t, procName: processesDB.find(p => p.id === t.pid)?.name, procOwner: processesDB.find(p => p.id === t.pid)?.owner }));
-            const renderTree = (parentId) => {
-                const children = rolesDB.filter(r => r.parent === parentId);
-                if (children.length === 0) return null;
-                return (<ul>{children.map(child => <li key={child.id}><div className={`tree-card ${child.color || 'bg-white border-slate-200'}`}><div className="flex justify-between items-center mb-1 border-b border-black/5 pb-1"><span className="text-[10px] font-mono opacity-50">{child.id}</span><span className="text-[10px] font-bold bg-white/50 px-1 rounded text-slate-600">{child.holder}</span></div><div className="font-bold text-sm text-slate-800 py-1">{personnelDB.find(p => p.code === child.holder)?.name}</div><div className="text-xs text-slate-500">{child.title}</div></div>{renderTree(child.id)}</li>)}</ul>);
-            }
             const departments = ['Top', 'Admin', 'Finance', 'Marketing', 'Education'];
             const deptNames = { 'Top': 'مدیریت ارشد', 'Admin': 'اداری و منابع انسانی', 'Finance': 'مالی', 'Marketing': 'مارکتینگ و فروش', 'Education': 'آموزش' };
 
             return (
-                <div className="min-h-screen bg-slate-100 font-sans text-slate-800 p-4 lg:p-6 print-container" dir="rtl">
-                    <header className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6 flex flex-col md:flex-row justify-between items-center gap-4 no-print">
+                <div className="min-h-screen bg-slate-100 font-sans text-slate-800 p-4 lg:p-6" dir="rtl">
+                    <header className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
                         <div>
-                            <h1 className="text-2xl font-black text-slate-800 flex items-center gap-3"><i className="fas fa-layer-group text-indigo-600 text-3xl"></i> سیستم مدیریت فرآیند <span className="text-yellow-600">EnglishLand</span></h1>
-                            <p className="text-sm text-slate-500 mt-2 font-bold">نسخه ۱۴.۰ | سوپر اپلیکیشن جامع (ادغام شده)</p>
+                            <h1 className="text-2xl font-black text-slate-800 flex items-center gap-3"><i className="fas fa-building text-indigo-600 text-3xl"></i> سیستم مدیریت EnglishLand</h1>
+                            <p className="text-sm text-slate-500 mt-2 font-bold">نسخه ۱۵.۰ (نهایی و اصلاح شده) | دپارتمان‌محور</p>
                         </div>
-                        <div className="flex bg-slate-100 p-1 rounded-xl overflow-x-auto max-w-full gap-1">
-                            <button onClick={() => setActiveTab('dashboard')} className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${activeTab === 'dashboard' ? 'bg-white text-indigo-700 shadow-md' : 'text-slate-500'}`}><i className="fas fa-chart-pie"></i> داشبورد</button>
-                            <button onClick={() => setActiveTab('dept')} className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${activeTab === 'dept' ? 'bg-white text-indigo-700 shadow-md' : 'text-slate-500'}`}><i className="fas fa-users"></i> دپارتمان‌ها</button>
-                            <button onClick={() => setActiveTab('raci')} className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${activeTab === 'raci' ? 'bg-white text-indigo-700 shadow-md' : 'text-slate-500'}`}><i className="fas fa-table"></i> ماتریس RACI</button>
-                            <button onClick={() => setActiveTab('process')} className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${activeTab === 'process' ? 'bg-white text-indigo-700 shadow-md' : 'text-slate-500'}`}><i className="fas fa-network-wired"></i> فرآیندها</button>
-                            <button onClick={() => setActiveTab('jd')} className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${activeTab === 'jd' ? 'bg-white text-indigo-700 shadow-md' : 'text-slate-500'}`}><i className="fas fa-file-alt"></i> شرح وظایف</button>
-                            <button onClick={() => setActiveTab('org')} className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${activeTab === 'org' ? 'bg-white text-indigo-700 shadow-md' : 'text-slate-500'}`}><i className="fas fa-sitemap"></i> چارت</button>
-                            <button onClick={() => setActiveTab('bpmn')} className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${activeTab === 'bpmn' ? 'bg-white text-indigo-700 shadow-md' : 'text-slate-500'}`}><i className="fas fa-project-diagram"></i> مدل گرافیکی</button>
-                            <button onClick={() => setActiveTab('print')} className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${activeTab === 'print' ? 'bg-white text-indigo-700 shadow-md' : 'text-slate-500'}`}><i className="fas fa-print"></i> چاپ</button>
+                        <div className="flex bg-slate-100 p-1 rounded-xl overflow-x-auto gap-2">
+                             <button onClick={() => setActiveTab('dept')} className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 ${activeTab === 'dept' ? 'bg-white text-indigo-700 shadow' : 'text-slate-500'}`}><i className="fas fa-users"></i> دپارتمان‌ها</button>
+                             <button onClick={() => window.print()} className="px-4 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700"><i className="fas fa-print"></i> چاپ</button>
                         </div>
                     </header>
 
-                    {/* 1. DASHBOARD */}
-                    {activeTab === 'dashboard' && (
-                        <div className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"><div><p className="text-sm text-slate-500 mb-1">تعداد کل فرآیندها</p><h3 className="text-3xl font-black text-indigo-600">{stats.totalProcesses}</h3></div><div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600"><i className="fas fa-cogs text-xl"></i></div></div>
-                                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"><div><p className="text-sm text-slate-500 mb-1">تعداد کل وظایف (Tasks)</p><h3 className="text-3xl font-black text-emerald-600">{stats.totalTasks}</h3></div><div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600"><i className="fas fa-tasks text-xl"></i></div></div>
-                                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"><div><p className="text-sm text-slate-500 mb-1">تعداد نقش‌های فعال</p><h3 className="text-3xl font-black text-pink-600">{rolesDB.length}</h3></div><div className="w-12 h-12 bg-pink-50 rounded-full flex items-center justify-center text-pink-600"><i className="fas fa-users text-xl"></i></div></div>
-                            </div>
-                            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><h3 className="font-bold text-slate-700 mb-6 flex items-center gap-2"><i className="fas fa-chart-bar"></i> تحلیل فشار کاری (۵ نقش پرکار)</h3><div className="space-y-4">{stats.busyRoles.map((role, idx) => (<div key={role.id}><div className="flex justify-between text-sm mb-1"><span className="font-bold text-slate-700">{role.name} <span className="text-slate-400 font-normal">({role.id})</span></span><span className="text-slate-500">{role.total} وظیفه</span></div><div className="w-full bg-slate-100 rounded-full h-2.5 flex overflow-hidden"><div className="bg-indigo-500 h-2.5" style={{ width: `${(role.main / role.total) * 100}%` }}></div><div className="bg-amber-400 h-2.5" style={{ width: `${(role.support / role.total) * 100}%` }}></div></div><div className="flex gap-4 mt-1 text-[10px] text-slate-400"><span className="flex items-center gap-1"><div className="w-2 h-2 bg-indigo-500 rounded-full"></div> اجرایی: {role.main}</span><span className="flex items-center gap-1"><div className="w-2 h-2 bg-amber-400 rounded-full"></div> پشتیبانی: {role.support}</span></div></div>))}</div></div>
-                        </div>
-                    )}
-
-                    {/* 2. DEPARTMENTS */}
                     {activeTab === 'dept' && (
                         <div>
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
@@ -429,75 +348,9 @@
                             {selectedDept ? (
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-2 mb-4"><div className="w-1 h-8 bg-indigo-600 rounded"></div><h2 className="text-xl font-bold text-slate-700">اعضای دپارتمان {deptNames[selectedDept]}</h2></div>
-                                    <div className="grid grid-cols-1 gap-6">{deptRoles.map(role => { const person = personnelDB.find(p => p.code === role.holder); const tasks = getRoleTasks(role.id); return (<div key={role.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"><div className={`p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 ${role.color.split(' ')[0]}`}><div className="flex items-center gap-4"><div className="w-16 h-16 rounded-full bg-white/50 flex items-center justify-center text-2xl font-bold border-2 border-white text-slate-600 shadow-sm">{person?.name.charAt(0)}</div><div><h3 className="text-xl font-black text-slate-800">{person?.name}</h3><div className="flex items-center gap-2 mt-1"><span className="text-sm font-bold bg-white/60 px-2 py-0.5 rounded border border-black/5">{role.title}</span><span className="text-xs font-mono opacity-50">{role.id}</span></div></div></div><div className="text-xs bg-white/80 p-2 rounded-lg border border-black/5 max-w-md"><strong>تعریف نقش:</strong> {role.desc}</div></div><div className="p-6"><h4 className="font-bold text-slate-700 mb-4 flex items-center gap-2 text-sm"><i className="fas fa-list-check text-indigo-500"></i> شرح وظایف تفکیک شده:</h4>{tasks.length > 0 ? (<div className="grid grid-cols-1 md:grid-cols-2 gap-3">{tasks.map((t, i) => (<div key={i} className="flex items-start gap-3 p-3 rounded-lg border border-slate-100 hover:border-indigo-200 bg-slate-50/50 transition-colors"><div className={`mt-1 min-w-[50px] text-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${t.type === 'Main' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : t.type === 'Control' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-amber-100 text-amber-700 border-amber-200'}`}>{t.type === 'Main' ? 'اجرا' : t.type === 'Control' ? 'ناظر' : 'حامی'}</div><div><p className="text-sm font-medium text-slate-800 leading-snug">{t.desc}</p><div className="flex gap-3 mt-1.5 text-[10px] text-slate-400"><span><i className="fas fa-project-diagram"></i> {t.procName}</span><span className="text-indigo-400"><i className="fas fa-clock"></i> {t.freq}</span></div></div></div>))}</div>) : (<div className="text-center py-8 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">هنوز وظیفه‌ای تعریف نشده است.</div>)}</div></div>) })}</div>
+                                    <div className="grid grid-cols-1 gap-6">{deptRoles.map(role => { const person = personnelDB.find(p => p.code === role.holder); const tasks = getRoleTasks(role.id); return (<div key={role.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"><div className={`p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 ${role.color.split(' ')[0]}`}><div className="flex items-center gap-4"><div className="w-16 h-16 rounded-full bg-white/50 flex items-center justify-center text-2xl font-bold border-2 border-white text-slate-600 shadow-sm">{person?.name ? person.name.charAt(0) : '?'}</div><div><h3 className="text-xl font-black text-slate-800">{person?.name || 'خالی (Vacant)'}</h3><div className="flex items-center gap-2 mt-1"><span className="text-sm font-bold bg-white/60 px-2 py-0.5 rounded border border-black/5">{role.title}</span><span className="text-xs font-mono opacity-50">{role.id}</span></div></div></div><div className="text-xs bg-white/80 p-2 rounded-lg border border-black/5 max-w-md"><strong>تعریف نقش:</strong> {role.desc}</div></div><div className="p-6"><h4 className="font-bold text-slate-700 mb-4 flex items-center gap-2 text-sm"><i className="fas fa-list-check text-indigo-500"></i> شرح وظایف تفکیک شده:</h4>{tasks.length > 0 ? (<div className="grid grid-cols-1 md:grid-cols-2 gap-3">{tasks.map((t, i) => (<div key={i} className="flex items-start gap-3 p-3 rounded-lg border border-slate-100 hover:border-indigo-200 bg-slate-50/50 transition-colors"><div className={`mt-1 min-w-[50px] text-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${t.type === 'Main' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : t.type === 'Control' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-amber-100 text-amber-700 border-amber-200'}`}>{t.type === 'Main' ? 'اجرا' : t.type === 'Control' ? 'ناظر' : 'حامی'}</div><div><p className="text-sm font-medium text-slate-800 leading-snug">{t.desc}</p><div className="flex gap-3 mt-1.5 text-[10px] text-slate-400"><span><i className="fas fa-project-diagram"></i> {t.procName}</span><span className="text-indigo-400"><i className="fas fa-clock"></i> {t.freq}</span></div></div></div>))}</div>) : (<div className="text-center py-8 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">هنوز وظیفه‌ای در سیستم برای این نقش تعریف نشده است.</div>)}</div></div>) })}</div>
                                 </div>
                             ) : (<div className="text-center py-20 text-slate-400 bg-white rounded-2xl border border-dashed border-slate-300"><i className="fas fa-building text-4xl mb-4 opacity-20"></i><p>لطفاً برای مشاهده شرح وظایف، یکی از دپارتمان‌های بالا را انتخاب کنید.</p></div>)}
-                        </div>
-                    )}
-
-                    {/* 3. RACI MATRIX */}
-                    {activeTab === 'raci' && (
-                        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto">
-                            <h3 className="font-bold text-slate-700 mb-4 flex items-center gap-2"><i className="fas fa-table"></i> ماتریس مسئولیت‌ها (RACI)</h3>
-                            <table className="w-full text-xs border-collapse"><thead><tr className="bg-slate-100"><th className="p-3 border border-slate-200 text-right min-w-[200px]">فرآیند</th>{rolesDB.filter(r => r.id !== 'R-TCH-H' && r.id !== 'R-TCH-O' && r.id !== 'R-SRV').map(r => (<th key={r.id} className="p-2 border border-slate-200 text-center w-16 rotate-45 h-24 align-bottom pb-2"><span className="block transform -rotate-45 origin-bottom-left w-24 overflow-hidden text-ellipsis whitespace-nowrap">{r.title}</span></th>))}</tr></thead><tbody>{processesDB.map(proc => (<tr key={proc.id} className="hover:bg-slate-50"><td className="p-2 border border-slate-200 font-bold text-slate-700">{proc.name}<div className="text-[9px] text-slate-400 font-normal">{proc.id}</div></td>{rolesDB.filter(r => r.id !== 'R-TCH-H' && r.id !== 'R-TCH-O' && r.id !== 'R-SRV').map(r => { const type = raciMatrix[proc.id][r.id]; let cellClass = ""; if (type === 'A') cellClass = "bg-red-100 text-red-700 font-black"; else if (type === 'R') cellClass = "bg-green-100 text-green-700 font-bold"; else if (type === 'C' || type === 'I') cellClass = "bg-yellow-50 text-yellow-600"; return (<td key={r.id} className={`p-2 border border-slate-200 text-center ${cellClass}`}>{type}</td>); })}</tr>))}</tbody></table>
-                        </div>
-                    )}
-
-                    {/* 4. PROCESS MAP */}
-                    {activeTab === 'process' && (
-                        <div className="grid grid-cols-1 gap-6">
-                           {processesDB.map(proc => (
-                             <div key={proc.id} className={`bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm ${proc.id.includes('17') || proc.id.includes('18') ? 'ring-2 ring-red-100' : ''}`}>
-                               <div className={`p-4 border-b border-slate-200 ${proc.id.includes('17') || proc.id.includes('18') ? 'bg-red-50' : 'bg-slate-50'}`}>
-                                 <div className="flex justify-between items-center"><h3 className="font-bold text-slate-800 flex items-center gap-2">{proc.id.includes('17') || proc.id.includes('18') ? <i className="fas fa-exclamation-triangle text-red-500"></i> : <div className="w-2 h-2 bg-blue-500 rounded-full"></div>} {proc.name} <span className="text-xs font-normal text-slate-400">({proc.id})</span></h3><div className="text-xs text-slate-500 bg-white border border-slate-200 px-2 py-1 rounded">ناظر: <strong className="text-blue-600">{rolesDB.find(r => r.id === proc.owner)?.title}</strong> {proc.kpi && <span className="mr-2 text-emerald-600">| KPI: {proc.kpi}</span>}</div></div><p className="text-xs text-slate-500 mt-2 mr-4">{proc.description}</p>
-                               </div>
-                               <div className="p-6 overflow-x-auto"><div className="flex items-start min-w-max gap-4">{tasksDB.filter(t => t.pid === proc.id).map((task, idx) => (<div key={task.id} className="flex items-center gap-4"><div className="relative w-64 bg-white border border-slate-200 rounded-lg p-3 shadow-sm hover:border-blue-300 hover:shadow-md transition-all group"><div className="absolute top-0 right-0 bg-slate-100 text-slate-500 text-[9px] px-2 rounded-bl-lg border-b border-l border-slate-200">مرحله {idx + 1}</div><div className="mt-3"><div className="text-xs font-bold text-slate-700 mb-1 line-clamp-2 h-8">{task.desc}</div><div className="flex justify-between items-end mt-2 pt-2 border-t border-slate-100"><div><div className="text-[10px] text-blue-600 font-bold">{rolesDB.find(r => r.id === task.role)?.title}</div><div className="text-[9px] text-slate-400">{personnelDB.find(p => p.code === rolesDB.find(r => r.id === task.role).holder)?.name}</div></div><div className="text-[9px] bg-slate-50 px-1.5 py-0.5 rounded text-slate-500 border border-slate-100">{task.freq}</div></div></div></div>{idx < tasksDB.filter(t => t.pid === proc.id).length - 1 && (<i className="fas fa-arrow-left text-slate-300"></i>)}</div>))}</div></div>
-                             </div>
-                           ))}
-                        </div>
-                    )}
-
-                    {/* 5. JD */}
-                    {activeTab === 'jd' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                            <div className="lg:col-span-1 space-y-2"><div className="bg-white p-3 rounded-lg border border-slate-200 mb-2"><h3 className="text-xs font-bold text-slate-400 mb-2">لیست پرسنل</h3></div><div className="space-y-2 h-[600px] overflow-y-auto">{rolesDB.filter(r => r.id.startsWith('R-')).map(role => (<button key={role.id} onClick={() => setSelectedRoleForJD(role.id)} className={`w-full text-right p-3 rounded-xl border transition-all ${selectedRoleForJD === role.id ? 'bg-indigo-50 border-indigo-300 shadow-sm' : 'bg-white border-slate-100 hover:bg-slate-50'}`}><div className="font-bold text-slate-700 text-sm">{personnelDB.find(x => x.code === role.holder)?.name || 'خالی'}</div><div className="text-xs text-slate-500">{role.title} <span className="font-mono text-[9px] bg-slate-100 px-1 rounded text-slate-400">{role.id}</span></div></button>))}</div></div>
-                            <div className="lg:col-span-3">{selectedRoleForJD ? (<div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 min-h-[600px]"><div className="flex items-center gap-4 mb-8 pb-6 border-b border-slate-100"><div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-2xl font-bold">{personnelDB.find(p => p.code === rolesDB.find(r => r.id === selectedRoleForJD).holder)?.name.charAt(0) || '?'}</div><div><h2 className="text-2xl font-black text-slate-800">{personnelDB.find(p => p.code === rolesDB.find(r => r.id === selectedRoleForJD).holder)?.name || 'خالی'}</h2><div className="text-indigo-600 font-bold bg-indigo-50 px-3 py-1 rounded-full text-sm inline-block mt-2">{rolesDB.find(r => r.id === selectedRoleForJD).title}<span className="mr-2 text-indigo-400 text-xs border-r border-indigo-200 pr-2 font-mono">{selectedRoleForJD}</span></div></div></div><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><div className="col-span-2"><h3 className="font-bold text-slate-700 mb-4 flex items-center gap-2"><i className="fas fa-briefcase"></i> لیست وظایف</h3><div className="space-y-3">{getJD(selectedRoleForJD).length > 0 ? getJD(selectedRoleForJD).map((task, idx) => (<div key={idx} className="flex items-start gap-4 p-4 rounded-xl border border-slate-100 hover:border-indigo-200 hover:shadow-sm transition-all bg-slate-50/50"><div className={`mt-1 min-w-[60px] text-center px-2 py-1 rounded text-[10px] font-bold ${task.type === 'Main' ? 'bg-emerald-100 text-emerald-700' : task.type === 'Control' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>{task.type === 'Main' ? 'اجرا' : task.type === 'Control' ? 'تایید' : 'کمک'}</div><div className="flex-grow"><p className="text-sm font-bold text-slate-800">{task.desc}</p><div className="flex gap-4 mt-2 text-xs text-slate-400"><span className="flex items-center gap-1"><i className="fas fa-layer-group"></i> {task.procName}</span><span className="flex items-center gap-1 text-indigo-400"><i className="fas fa-clock"></i> {task.freq}</span></div></div></div>)) : <div className="text-center py-10 text-slate-400">وظیفه‌ای تعریف نشده است.</div>}</div></div></div></div>) : <div className="h-full flex items-center justify-center text-slate-300">لطفاً یک شخص را انتخاب کنید</div>}</div>
-                        </div>
-                    )}
-
-                    {/* 6. ORG CHART */}
-                    {activeTab === 'org' && (
-                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-10 overflow-x-auto text-center" dir="ltr">
-                            <div className="tree">
-                                <ul>{rolesDB.filter(r => r.parent === null).map(rootRole => (<li key={rootRole.id}><div className={`tree-card ${rootRole.color}`}><div className="flex justify-between items-center mb-1 border-b border-black/5 pb-1"><span className="text-[10px] font-mono opacity-50">{rootRole.id}</span><span className="text-[10px] font-bold bg-white/50 px-1 rounded text-slate-600">{rootRole.holder}</span></div><div className="font-bold text-lg text-slate-800 py-1">{personnelDB.find(p => p.code === rootRole.holder)?.name}</div><div className="text-xs text-slate-500">{rootRole.title}</div></div>{renderTree(rootRole.id)}</li>))}</ul>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* 7. BPMN MODEL */}
-                    {activeTab === 'bpmn' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                            <div className="lg:col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 h-[calc(100vh-200px)] overflow-y-auto"><h3 className="font-bold text-slate-700 mb-4 flex items-center gap-2"><i className="fas fa-layer-group"></i> انتخاب فرآیند</h3><div className="space-y-2">{processesDB.map(proc => (<button key={proc.id} onClick={() => setSelectedProcess(proc.id)} className={`w-full text-right p-3 rounded-xl border transition-all text-xs font-bold flex flex-col gap-1 ${selectedProcess === proc.id ? 'bg-indigo-50 border-indigo-300 text-indigo-800 shadow-sm' : 'bg-white border-slate-100 text-slate-600 hover:bg-slate-50'}`}><div className="flex justify-between w-full"><span>{proc.name}</span><span className="opacity-50">{proc.id}</span></div></button>))}</div></div>
-                            <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 overflow-x-auto relative">
-                                <div className="absolute top-4 left-4 bg-slate-100 px-3 py-1 rounded text-xs text-slate-500 font-mono">BPMN View Mode</div><h2 className="text-xl font-black text-indigo-900 mb-2 flex items-center gap-2">{processesDB.find(p => p.id === selectedProcess).name}</h2><p className="text-sm text-slate-500 mb-8 max-w-2xl">{processesDB.find(p => p.id === selectedProcess).description}</p>
-                                <div className="min-w-[800px] border-2 border-slate-300 rounded-lg bg-slate-50 relative"><div className="absolute top-0 bottom-0 left-10 w-px bg-slate-200 z-0"></div>{bpmnData.involvedRoles.map((roleId, rIndex) => (<div key={roleId} className="flex border-b border-slate-300 last:border-b-0 min-h-[120px]"><div className={`w-40 flex-shrink-0 p-4 border-l border-slate-300 flex flex-col justify-center items-center text-center ${rolesDB.find(r => r.id === roleId).color}`}><div className="font-bold text-xs">{rolesDB.find(r => r.id === roleId).title}</div><div className="text-[10px] opacity-70 mt-1">{personnelDB.find(p => p.code === rolesDB.find(r => r.id === roleId).holder)?.name}</div></div><div className="flex-grow relative p-4 flex items-center gap-8 overflow-x-auto">{bpmnData.tasks.filter(t => t.role === roleId).map((task, tIndex) => (<div key={task.id} className="relative z-10"><div className={`w-48 p-3 rounded-lg border-2 shadow-sm text-right relative ${task.type === 'Control' ? 'border-red-200 bg-red-50' : task.type === 'Support' ? 'border-amber-200 bg-amber-50' : 'border-indigo-200 bg-white'}`}>{tIndex === 0 && rIndex === 0 && <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-2 h-2 bg-green-500 rounded-full"></div>}<div className="text-[10px] font-bold opacity-50 mb-1 flex justify-between"><span>{task.id}</span><span className="uppercase">{task.type}</span></div><div className="text-xs font-bold text-slate-800 leading-tight">{task.desc}</div><div className="absolute top-1/2 -left-4 transform -translate-y-1/2 text-slate-300"><i className="fas fa-arrow-left"></i></div></div></div>))}</div></div>))}</div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* 8. PRINT */}
-                    {activeTab === 'print' && (
-                        <div className="bg-white p-8 max-w-4xl mx-auto">
-                            <div className="no-print mb-6 flex justify-between"><h2 className="text-xl font-bold">پیش‌نمایش چاپ</h2><button onClick={() => window.print()} className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700"><i className="fas fa-print"></i> چاپ کتابچه</button></div>
-                            <div className="text-center mb-10 border-b-2 border-black pb-4"><h1 className="text-3xl font-black mb-2">کتابچه جامع فرآیندهای عملیاتی (SOP)</h1><h2 className="text-xl">مجموعه آموزشی EnglishLand</h2><p className="mt-4 text-sm">تاریخ استخراج: {new Date().toLocaleDateString('fa-IR')}</p></div>
-                            <div className="space-y-8">
-                                {processesDB.map((proc, index) => (
-                                    <div key={proc.id} className={`print-card ${index > 0 ? 'page-break' : ''}`}>
-                                        <div className="print-header p-4 flex justify-between items-center border-b border-black bg-gray-100"><div><h3 className="font-bold text-lg">{proc.name}</h3><p className="text-xs mt-1">{proc.description}</p></div><div className="text-left text-xs"><div className="font-mono">{proc.id}</div><div>ناظر: {rolesDB.find(r => r.id === proc.owner)?.title}</div></div></div>
-                                        <div className="p-4"><table className="w-full text-sm border-collapse border border-gray-300"><thead><tr className="bg-gray-50"><th className="border border-gray-300 p-2 w-10">#</th><th className="border border-gray-300 p-2">شرح اقدام (Task)</th><th className="border border-gray-300 p-2 w-32">مجری مسئول</th><th className="border border-gray-300 p-2 w-20">نوع نقش</th><th className="border border-gray-300 p-2 w-20">تواتر</th></tr></thead><tbody>{tasksDB.filter(t => t.pid === proc.id).map((task, i) => (<tr key={task.id}><td className="border border-gray-300 p-2 text-center">{i + 1}</td><td className="border border-gray-300 p-2 font-medium">{task.desc}</td><td className="border border-gray-300 p-2 text-center text-xs">{rolesDB.find(r => r.id === task.role)?.title}</td><td className="border border-gray-300 p-2 text-center text-xs">{task.type === 'Main' ? 'مجری' : task.type === 'Control' ? 'ناظر' : 'پشتیبان'}</td><td className="border border-gray-300 p-2 text-center text-xs">{task.freq}</td></tr>))}</tbody></table></div>
-                                    </div>
-                                ))}
-                            </div>
                         </div>
                     )}
                 </div>
